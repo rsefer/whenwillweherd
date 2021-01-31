@@ -72,14 +72,21 @@ axios.get(url).then((response) => {
 		});
 		entities = entities.filter((v, i, a) => a.indexOf(v) === i);
 		let keepLastCount = 14;
+		let herdPercentage = 0.75;
 		let formattedData = {
 			entities: [],
+			entitiesList: [],
 			populations: populations,
 			labels: {
 				lastXDays: `Last ${keepLastCount} Days`
 			}
 		};
 		for (var entity of entities) {
+			if (!Object.keys(formattedData.populations).includes(entity)) {
+				continue;
+			} else {
+				formattedData.entitiesList.push(entity);
+			}
 			let thisEntityObj = {
 				name: entity,
 				days: [],
@@ -108,15 +115,49 @@ axios.get(url).then((response) => {
 				}
 			});
 			if (populations[thisEntityObj.name]) {
+				const today = new Date();
 				thisEntityObj.population = populations[thisEntityObj.name];
-				thisEntityObj.remaining_vacs_needed_double_total = (thisEntityObj.population * 2) - thisEntityObj.total_vaccinations;
+
+				// herd
+				thisEntityObj.herd_vacs_needed_double = (thisEntityObj.population * 2 * herdPercentage) - thisEntityObj.total_vaccinations;
+				thisEntityObj.herd_days_needed_double = Math.ceil(thisEntityObj.herd_vacs_needed_double / thisEntityObj.rolling_average_7);
+				let herdDateDouble = new Date();
+				herdDateDouble.setDate(today.getDate() + thisEntityObj.herd_days_needed_double);
+				thisEntityObj.herd_date_double = herdDateDouble;
+				thisEntityObj.herd_date_double_label = easyDate(thisEntityObj.herd_date_double);
+
+				// complete
+				thisEntityObj.completion_vacs_needed_double = (thisEntityObj.population * 2) - thisEntityObj.total_vaccinations;
+				thisEntityObj.completion_days_needed_double = Math.ceil(thisEntityObj.completion_vacs_needed_double / thisEntityObj.rolling_average_7);
+				let completionDateDouble = new Date();
+				completionDateDouble.setDate(today.getDate() + thisEntityObj.completion_days_needed_double);
+				thisEntityObj.completion_date_double = completionDateDouble;
+				thisEntityObj.completion_date_double_label = easyDate(thisEntityObj.completion_date_double);
+
 			}
 			thisEntityObj.days.splice(0, thisEntityObj.days.length - keepLastCount);
 			formattedData.entities.push(thisEntityObj);
 		}
+		formattedData.entitiesList = formattedData.entitiesList.filter((v, i, a) => a.indexOf(v) === i);
 		fs.writeFile('data.json', JSON.stringify(formattedData), function (err) {
 			if (err) return console.log(err);
 		});
 
 	});
 });
+
+function easyDate(date) {
+	const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'];
+	let label = '';
+	if (date.getDate() < 10) {
+		label += 'Early ';
+	} else if (date.getDate() < 20) {
+		label += 'Mid-';
+	} else {
+		label += 'Late ';
+	}
+	label += monthNames[date.getMonth()];
+	label += ' ' + date.getFullYear();
+	return label;
+}

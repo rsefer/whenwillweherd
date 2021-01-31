@@ -1,0 +1,17 @@
+[[redirects]]
+  from = "http://whenwillweherd.com/*"
+  to = "https://whenwillweherd.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.whenwillweherd.com/*"
+  to = "https://whenwillweherd.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.whenwillweherd.com/*"
+  to = "https://whenwillweherd.com/:splat"
+  status = 301
+  force = true
