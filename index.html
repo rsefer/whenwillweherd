@@ -3,32 +3,32 @@ layout: default.njk
 title: 'Home'
 ---
 
-<div class="bg-gray-50">
-  <div class="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
-		<div class="sm:text-center lg:text-left">
-			<h1 class="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-				<span class="block xl:inline">When will we reach</span>
-				<span class="block text-indigo-600 xl:inline">Herd Immunity?</span>
-			</h1>
-			<p class="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-				Herd immunity is based on 75% at double dosage.
-			</p>
-		</div>
+<div class="bg-gray-50 py-6 text-center">
+  <div class="mt-5 mb-5 mx-auto max-w-7xl px-4 lg:px-8">
+		<h1 class="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
+			<span class="block xl:inline">When will we reach</span>
+			<span class="block text-indigo-600 xl:inline">Herd Immunity?</span>
+		</h1>
+		<p class="mt-3 text-base text-gray-600 sm:mt-5 sm:text-lg sm:mx-12 md:mx-24 md:mt-5">
+			Herd immunity is based on 75% of the population at double dosage. As the 7 Day Rolling Average changes, the herd immunity date will also change. Please read our <a href="#notes" class="text-red-400">notes</a> below.
+		</p>
+		<p class="mt-3 text-gray-600 text-xs text-center">
+			Most recent date: {{ data.dataFormatted.lastDate }} pulled from the <a href="https://covid.cdc.gov/covid-data-tracker/#vaccinations" class="text-green-400">CDC</a> via <a href="https://github.com/owid/covid-19-data/tree/master/public/data/vaccinations" class="text-green-400">owid/covid-19-data</a><br>Site last updated: {{ data.timestamp }}
+		</p>
   </div>
 </div>
 
-
-
-<select id="select-state">
-	<option></option>
-	{% for state in data.entitiesList %}
-	<option value="{{ state }}">{{ state }}</option>
-	{% endfor %}
-</select>
-
-<div class="container mx-auto">
-	<div id="charts-wrap" class="charts-wrap grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="container mx-auto py-12">
+	<div class="col-span-6 sm:col-span-3">
+		<label for="select-state" class="block text-sm font-medium text-gray-700">Select your State</label>
+		<select id="select-state" name="select-state" autocomplete="state" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+			<option></option>
+			{% for state in data.entitiesList %}
+			<option value="{{ state }}">{{ state }}</option>
+			{% endfor %}
+		</select>
 	</div>
+	<div id="charts-wrap" class="charts-wrap grid grid-cols-1 md:grid-cols-2 gap-12 mt-6"></div>
 </div>
 
 <div class="entity-template">
@@ -36,18 +36,31 @@ title: 'Home'
 		<div class="px-4 py-5 sm:px-6">
 			<h3 class="entity-title text-lg leading-6 font-medium text-gray-900"></h3>
 		</div>
-		<div class="entity-chart"></div>
+		<div class="border-t border-gray-200">
+			<dl>
+				<div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
+					<dt class="text-sm font-medium text-gray-600">
+						Herd Immunity
+					</dt>
+					<dd class="mt-1 text-sm text-gray-900 sm:mt-0">
+						<div class="entity-herd-date-double"></div>
+						<div>(<span class="entity-herd-days-needed-double"></span> days)</div>
+					</dd>
+				</div>
+			</dl>
+		</div>
+		<div class="entity-chart mt-6"></div>
 		<div class="border-t border-gray-200">
 			<dl>
 				<div class="px-4 py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
-					<dt class="text-sm font-medium text-gray-500">
+					<dt class="text-sm font-medium text-gray-600">
 						Population
 					</dt>
 					<dd class="entity-population mt-1 text-sm text-gray-900 sm:mt-0">
 					</dd>
 				</div>
 				<div class="px-4 py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
-					<dt class="text-sm font-medium text-gray-500">
+					<dt class="text-sm font-medium text-gray-600">
 						Vacs Given
 					</dt>
 					<dd class="mt-1 text-sm text-gray-900 sm:mt-0">
@@ -56,26 +69,26 @@ title: 'Home'
 					</dd>
 				</div>
 				<div class="px-4 py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
-					<dt class="text-sm font-medium text-gray-500">
+					<dt class="text-sm font-medium text-gray-600">
 						7 Day Rolling Average
 					</dt>
 					<dd class="entity-7-day-rolling-average mt-1 text-sm text-gray-900 sm:mt-0">
 					</dd>
 				</div>
 				<div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-1 sm:px-6">
-          <dt class="text-sm font-medium text-gray-500">
+          <dt class="text-sm font-medium text-gray-600">
             Herd Immunity
           </dt>
 				</div>
 				<div class="px-4 py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
-					<dt class="text-sm font-medium text-gray-500">
+					<dt class="text-sm font-medium text-gray-600">
 						Remaining Vaccinations Needed
 					</dt>
 					<dd class="entity-herd-remaining-vacs-needed-double mt-1 text-sm text-gray-900 sm:mt-0">
 					</dd>
 				</div>
 				<div class="px-4 py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
-					<dt class="text-sm font-medium text-gray-500">
+					<dt class="text-sm font-medium text-gray-600">
 						Days Needed
 					</dt>
 					<dd class="mt-1 text-sm text-gray-900 sm:mt-0">
@@ -84,19 +97,19 @@ title: 'Home'
 					</dd>
 				</div>
 				<div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-1 sm:px-6">
-          <dt class="text-sm font-medium text-gray-500">
+          <dt class="text-sm font-medium text-gray-600">
             Completion
           </dt>
         </div>
 				<div class="px-4 py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
-					<dt class="text-sm font-medium text-gray-500">
+					<dt class="text-sm font-medium text-gray-600">
 						Remaining Vaccinations Needed
 					</dt>
 					<dd class="entity-completion-remaining-vacs-needed-double mt-1 text-sm text-gray-900 sm:mt-0">
 					</dd>
 				</div>
 				<div class="px-4 py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
-					<dt class="text-sm font-medium text-gray-500">
+					<dt class="text-sm font-medium text-gray-600">
 						Days Needed
 					</dt>
 					<dd class="mt-1 text-sm text-gray-900 sm:mt-0">
@@ -106,6 +119,23 @@ title: 'Home'
 				</div>
 			</dl>
 		</div>
+	</div>
+</div>
+
+<div id="notes" class="bg-gray-50 ">
+	<div class="container mx-auto py-12">
+		<h2 class="text-2xl tracking-tight font-extrabold text-gray-900">Notes</h2>
+		<p class="text-gray-600 mt-3">
+			As the 7 Day Rolling Average changes, the herd immunity date will also change. Note: this date is purely an educated estimate based on available data. Please refer to CDC guidelines for more accurate information.
+		</p>
+	</div>
+</div>
+
+<div class="container mx-auto py-12">
+	<div class="text-center">
+		<p class="text-gray-600 mt-3">
+			This site is made by <a href="https://seferdesign.com" class="text-red-400">Sefer Design Co.</a>, with inspiration from <a href="https://www.bloomberg.com/graphics/covid-vaccine-tracker-global-distribution/" class="text-green-400">Bloomberg</a>, <a href="https://www.nytimes.com/interactive/2020/us/covid-19-vaccine-doses.html" class="text-green-400">The New York Times</a>, and many others. Contribute on <a href="https://github.com/rsefer/whenwillweherd">GitHub</a>.
+		</p>
 	</div>
 </div>
 
@@ -137,7 +167,8 @@ jQuery(document).ready(function($) {
 			thousandsSep: ','
 		},
 		chart: {
-			type: 'column'
+			type: 'column',
+			height: '250'
 		},
 		plotOptions: {
 			series: {
@@ -170,12 +201,17 @@ jQuery(document).ready(function($) {
 		}
 		Highcharts.chart('entity-chart-' + i, {
 			title: {
-				text: data.labels.lastXDays
+				text: null
 			},
 			xAxis: {
 				categories: entity.days.map(day => day.date.substring(5, day.date.length)),
 				labels: {
 					step: 4
+				}
+			},
+			yAxis: {
+				title: {
+					text: 'Vaccinations'
 				}
 			},
 			series: [

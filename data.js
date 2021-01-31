@@ -112,6 +112,8 @@ axios.get(url).then((response) => {
 					thisEntityObj.total_vaccinations = parseInt(day.total_vaccinations);
 					thisEntityObj.rolling_average_7 = rollingAverage;
 					thisEntityObj.total_vaccinations_per_hundred = parseFloat(day.total_vaccinations_per_hundred);
+					console.log(day);
+					formattedData.lastDate = day.date;
 				}
 			});
 			if (populations[thisEntityObj.name]) {
@@ -119,7 +121,7 @@ axios.get(url).then((response) => {
 				thisEntityObj.population = populations[thisEntityObj.name];
 
 				// herd
-				thisEntityObj.herd_vacs_needed_double = (thisEntityObj.population * 2 * herdPercentage) - thisEntityObj.total_vaccinations;
+				thisEntityObj.herd_vacs_needed_double = Math.ceil((thisEntityObj.population * 2 * herdPercentage) - thisEntityObj.total_vaccinations);
 				thisEntityObj.herd_days_needed_double = Math.ceil(thisEntityObj.herd_vacs_needed_double / thisEntityObj.rolling_average_7);
 				let herdDateDouble = new Date();
 				herdDateDouble.setDate(today.getDate() + thisEntityObj.herd_days_needed_double);
@@ -127,7 +129,7 @@ axios.get(url).then((response) => {
 				thisEntityObj.herd_date_double_label = easyDate(thisEntityObj.herd_date_double);
 
 				// complete
-				thisEntityObj.completion_vacs_needed_double = (thisEntityObj.population * 2) - thisEntityObj.total_vaccinations;
+				thisEntityObj.completion_vacs_needed_double = Math.ceil((thisEntityObj.population * 2) - thisEntityObj.total_vaccinations);
 				thisEntityObj.completion_days_needed_double = Math.ceil(thisEntityObj.completion_vacs_needed_double / thisEntityObj.rolling_average_7);
 				let completionDateDouble = new Date();
 				completionDateDouble.setDate(today.getDate() + thisEntityObj.completion_days_needed_double);
