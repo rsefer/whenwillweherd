@@ -59,11 +59,19 @@ title: 'Home'
 			<dl>
 				<div class="bg-green-50 px-4 py-5 grid grid-cols-2 sm:gap-4 sm:px-6">
 					<dt class="text-sm font-medium text-gray-600">
-						Herd Immunity
+						Herd Immunity<br>
+						<small>({{ data.dataFormatted.herdPercentageLabel }}% of the population)</small>
 					</dt>
 					<dd class="mt-1 text-sm text-gray-900 sm:mt-0 text-right">
 						<div class="entity-herd-date-double"></div>
-						<div><em>(<span class="entity-herd-days-needed-double"></span> days)</em></div>
+						<div style="display: none;"><small><em>(<span class="entity-herd-days-needed-double"></span> days)</em></small></div>
+					</dd>
+				</div>
+				<div class="px-4 py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
+					<dt class="text-sm font-medium text-gray-600">
+						Remaining Vaccinations Needed
+					</dt>
+					<dd class="entity-herd-remaining-vacs-needed-double mt-1 text-sm text-gray-900 sm:mt-0 text-right">
 					</dd>
 				</div>
 			</dl>
@@ -84,7 +92,7 @@ title: 'Home'
 					</dt>
 					<dd class="mt-1 text-sm text-gray-900 sm:mt-0 text-right">
 						<div class="entity-vacs-given"></div>
-						<div><em>(<span class="entity-vacs-per-100"></span> per 100)</em></div>
+						<div><small><em>(<span class="entity-vacs-per-100"></span> per 100)</em></small></div>
 					</dd>
 				</div>
 				<div class="px-4 py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
@@ -94,28 +102,7 @@ title: 'Home'
 					<dd class="entity-7-day-rolling-average mt-1 text-sm text-gray-900 sm:mt-0 text-right">
 					</dd>
 				</div>
-				<div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-1 sm:px-6">
-          <dt class="text-sm font-medium text-gray-600">
-            Herd Immunity ({{ data.dataFormatted.herdPercentageLabel }}% of the population)
-          </dt>
-				</div>
-				<div class="px-4 py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
-					<dt class="text-sm font-medium text-gray-600">
-						Remaining Vaccinations Needed
-					</dt>
-					<dd class="entity-herd-remaining-vacs-needed-double mt-1 text-sm text-gray-900 sm:mt-0 text-right">
-					</dd>
-				</div>
-				<div class="px-4 py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
-					<dt class="text-sm font-medium text-gray-600">
-						Days Needed
-					</dt>
-					<dd class="mt-1 text-sm text-gray-900 sm:mt-0 text-right">
-						<div class="entity-herd-date-double"></div>
-						<div><em>(<span class="entity-herd-days-needed-double"></span> days)</em></div>
-					</dd>
-				</div>
-				<div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-1 sm:px-6">
+				<!-- <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-1 sm:px-6">
           <dt class="text-sm font-medium text-gray-600">
             Completion (~100% of the population)
           </dt>
@@ -135,7 +122,7 @@ title: 'Home'
 						<div class="entity-completion-date-double"></div>
 						<div><em>(<span class="entity-completion-days-needed-double"></span> days)</em></div>
 					</dd>
-				</div>
+				</div> -->
 			</dl>
 		</div>
 	</div>
@@ -193,17 +180,20 @@ jQuery(document).ready(function($) {
 		entityBlock.find('.entity-vacs-per-100').text(entity.total_vaccinations_per_hundred);
 		entityBlock.find('.entity-7-day-rolling-average').text(numberWithCommas(entity.rolling_average_7));
 
+		// herd
 		entityBlock.find('.entity-herd-date-double').text(entity.herd_date_double_label);
 		entityBlock.find('.entity-herd-days-needed-double').text(entity.herd_days_needed_double);
 		if (entity.herd_vacs_needed_double) {
 			entityBlock.find('.entity-herd-remaining-vacs-needed-double').text(numberWithCommas(entity.herd_vacs_needed_double));
 		}
 
-		entityBlock.find('.entity-completion-date-double').text(entity.completion_date_double_label);
-		entityBlock.find('.entity-completion-days-needed-double').text(entity.completion_days_needed_double);
-		if (entity.completion_vacs_needed_double) {
-			entityBlock.find('.entity-completion-remaining-vacs-needed-double').text(numberWithCommas(entity.completion_vacs_needed_double));
-		}
+		// // complete
+		// entityBlock.find('.entity-completion-date-double').text(entity.completion_date_double_label);
+		// entityBlock.find('.entity-completion-days-needed-double').text(entity.completion_days_needed_double);
+		// if (entity.completion_vacs_needed_double) {
+		// 	entityBlock.find('.entity-completion-remaining-vacs-needed-double').text(numberWithCommas(entity.completion_vacs_needed_double));
+		// }
+
 		Highcharts.chart('entity-chart-' + i, {
 			title: {
 				text: null
