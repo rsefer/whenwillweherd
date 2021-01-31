@@ -71,15 +71,17 @@ axios.get(url).then((response) => {
 		});
 		entities = entities.filter((v, i, a) => a.indexOf(v) === i);
 		let keepLastCount = 14;
-		let herdPercentage = 0.75;
 		let formattedData = {
 			entities: [],
 			entitiesList: [],
+			herdPercentage: 0.75,
 			populations: populations,
 			labels: {
 				lastXDays: `Last ${keepLastCount} Days`
 			}
 		};
+		formattedData.herdPercentageLabel = parseInt(formattedData.herdPercentage * 100);
+
 		for (var entity of entities) {
 			if (!Object.keys(formattedData.populations).includes(entity)) {
 				continue;
@@ -111,7 +113,6 @@ axios.get(url).then((response) => {
 					thisEntityObj.total_vaccinations = parseInt(day.total_vaccinations);
 					thisEntityObj.rolling_average_7 = rollingAverage;
 					thisEntityObj.total_vaccinations_per_hundred = parseFloat(day.total_vaccinations_per_hundred);
-					console.log(day);
 					formattedData.lastDate = day.date;
 				}
 			});
@@ -120,7 +121,7 @@ axios.get(url).then((response) => {
 				thisEntityObj.population = populations[thisEntityObj.name];
 
 				// herd
-				thisEntityObj.herd_vacs_needed_double = Math.ceil((thisEntityObj.population * 2 * herdPercentage) - thisEntityObj.total_vaccinations);
+				thisEntityObj.herd_vacs_needed_double = Math.ceil((thisEntityObj.population * 2 * formattedData.herdPercentage) - thisEntityObj.total_vaccinations);
 				thisEntityObj.herd_days_needed_double = Math.ceil(thisEntityObj.herd_vacs_needed_double / thisEntityObj.rolling_average_7);
 				let herdDateDouble = new Date();
 				herdDateDouble.setDate(today.getDate() + thisEntityObj.herd_days_needed_double);
