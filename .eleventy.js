@@ -1,5 +1,8 @@
 module.exports = eleventyConfig => {
 
+	eleventyConfig.addPassthroughCopy({
+		'_src/images' : '/images'
+	});
 	eleventyConfig.addWatchTarget('_src/**/*.scss');
 	eleventyConfig.addWatchTarget('_src/**/*.js');
 
