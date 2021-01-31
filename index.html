@@ -1,0 +1,150 @@
+---
+layout: default.njk
+title: 'Home'
+---
+
+<div class="bg-gray-50">
+  <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8 lg:flex lg:items-center lg:justify-between">
+    <h2 class="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+      <span class="block">When will we reach Herd Immunity?</span>
+      <span class="block text-indigo-600">Let's make an educated prediction</span>
+    </h2>
+  </div>
+</div>
+
+<div class="container mx-auto">
+	<div id="charts-wrap" class="charts-wrap grid grid-cols-1 md:grid-cols-2 gap-4">
+	</div>
+</div>
+
+<div class="entity-template">
+	<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+		<div class="px-4 py-5 sm:px-6">
+			<h3 class="entity-title text-lg leading-6 font-medium text-gray-900"></h3>
+		</div>
+		<div class="entity-chart"></div>
+		<div class="border-t border-gray-200">
+			<dl>
+				<div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
+					<dt class="text-sm font-medium text-gray-500">
+						Population
+					</dt>
+					<dd class="entity-population mt-1 text-sm text-gray-900 sm:mt-0">
+					</dd>
+				</div>
+				<div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
+					<dt class="text-sm font-medium text-gray-500">
+						Vacs Given
+					</dt>
+					<dd class="mt-1 text-sm text-gray-900 sm:mt-0">
+						<div class="entity-vacs-given"></div>
+						<div>(<span class="entity-vacs-per-100"></span> per 100)</div>
+					</dd>
+				</div>
+				<div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
+					<dt class="text-sm font-medium text-gray-500">
+						7 Day Rolling Average
+					</dt>
+					<dd class="entity-7-day-rolling-average mt-1 text-sm text-gray-900 sm:mt-0">
+					</dd>
+				</div>
+				<div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6">
+					<dt class="text-sm font-medium text-gray-500">
+						Remaining Vaccinations Needed (Total)*
+					</dt>
+					<dd class="entity-reminaining-vacs-needed-double-total mt-1 text-sm text-gray-900 sm:mt-0">
+					</dd>
+				</div>
+			</dl>
+		</div>
+	</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+
+<script>
+{{ helpers.js | safe }}
+
+var data = {{ data.data | safe }};
+var urlParams = new URLSearchParams(window.location.search);
+var stateName = urlParams.get('state') || 'Illinois';
+var entities = [
+	data.entities.find(entity => entity.name == 'United States'),
+	data.entities.find(entity => entity.name == stateName)
+];
+
+Highcharts.setOptions({
+	lang: {
+		thousandsSep: ','
+	},
+	chart: {
+		type: 'column'
+	},
+	plotOptions: {
+		series: {
+			animation: false
+		}
+	},
+});
+
+entities.forEach(function(entity, i) {
+	var entityTemplate = $('.entity-template').html();
+	$('#charts-wrap').append('<div id="entity-' + i + '" class="entity">' + entityTemplate + '</div>');
+	var entityBlock = $('#entity-' + i);
+	entityBlock.find('.entity-chart').attr('id', 'entity-chart-' + i);
+	entityBlock.find('.entity-title').text(entity.name);
+	entityBlock.find('.entity-population').text(numberWithCommas(entity.population));
+	entityBlock.find('.entity-vacs-given').text(numberWithCommas(entity.total_vaccinations));
+	entityBlock.find('.entity-vacs-per-100').text(entity.total_vaccinations_per_hundred);
+	entityBlock.find('.entity-7-day-rolling-average').text(numberWithCommas(entity.rolling_average_7));
+	if (entity.remaining_vacs_needed_double_total) {
+		entityBlock.find('.entity-reminaining-vacs-needed-double-total').text(numberWithCommas(entity.remaining_vacs_needed_double_total));
+	}
+	Highcharts.chart('entity-chart-' + i, {
+		title: {
+			text: data.labels.lastXDays
+		},
+		xAxis: {
+			categories: entity.days.map(day => day.date.substring(5, day.date.length)),
+			labels: {
+				step: 4
+			}
+		},
+		series: [
+			{
+				name: 'Daily Vaccinations',
+				type: 'column',
+				data: entity.days.map(day => [day.date, parseInt(day.daily_vaccinations)])
+			},
+			{
+				name: '7 Day Rolling Average',
+				type: 'spline',
+				data: entity.days.map(day => [day.date, parseInt(day.rolling_average_7)])
+			}
+		],
+		tooltip: {
+			shared: true
+		}
+	});
+});
+var i = Highcharts.length;
+while (i--) {
+	Highcharts.each(series[i].points, function(p) {
+		p.setState('', true)
+	});
+	if (series[i] != this) {
+		l = this.linkedSeries.length;
+		while (l--) {
+			if (series[i] != this.linkedSeries[l]) {
+				series[i].hide()
+			}
+		}
+	}
+}
+
+function numberWithCommas(x) {
+	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+</script>

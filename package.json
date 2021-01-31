@@ -1,0 +1,24 @@
+{
+  "name": "whenwillweherd",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx @11ty/eleventy --serve --port=3000"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "csv-parse": "^4.15.0",
+    "highcharts": "^8.2.2",
+    "node-sass": "^5.0.0",
+    "tailwindcss": "^2.0.2",
+    "uglify-js": "^3.12.5"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "^0.11.1",
+    "@mightyplow/eleventy-plugin-cache-buster": "^1.1.3"
+  }
+}
