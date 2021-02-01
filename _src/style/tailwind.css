@@ -5,3 +5,7 @@
 .entity-template {
 	display: none;
 }
+
+.highcharts-plot-line {
+	stroke-dasharray: 4;
+}

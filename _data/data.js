@@ -95,8 +95,10 @@ async function formatData() {
 			name: entity,
 			days: [],
 			total_vaccinations: 0,
-			rolling_average_7: 0
+			rolling_average_7: 0,
+			population: formattedData.populations[entity]
 		};
+		thisEntityObj.herd_population = thisEntityObj.population * formattedData.herdPercentage;
 		parsed.filter((row) => row[1] == entity).forEach((row, i) => {
 			let dayLabel = `${row[0]}-${row[1]}`;
 			let day = {};
