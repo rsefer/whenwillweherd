@@ -22,9 +22,10 @@ title: 'Home'
 	<div class="mx-auto max-w-sm">
 		<label for="select-state" class="block text-sm font-medium text-gray-700">Select your State</label>
 		<select id="select-state" name="select-state" autocomplete="state" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-			<option></option>
 			{% for state in data.formatted.entitiesList %}
-			<option value="{{ state }}">{{ state }}</option>
+			{% if state == 'United States' %}{% else %}
+			<option value="{{ state }}">{% if state == 'New York State' %}New York{% else %}{{ state }}{% endif %}</option>
+			{% endif %}
 			{% endfor %}
 		</select>
 	</div>
@@ -138,6 +139,9 @@ jQuery(document).ready(function($) {
 
 	var urlParams = new URLSearchParams(window.location.search);
 	var stateName = urlParams.get('state') || 'Illinois';
+	if (stateName == 'New York') {
+		stateName = 'New York State';
+	}
 	$('#select-state').val(stateName);
 
 	$('body').on('change', '#select-state', function() {

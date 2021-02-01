@@ -36,6 +36,7 @@ const populations = {
 	'New Jersey': 8882190,
 	'New Mexico': 2096829,
 	'New York': 19453561,
+	'New York State': 19453561,
 	'North Carolina': 10488084,
 	'North Dakota': 762062,
 	'Ohio': 11689100,
