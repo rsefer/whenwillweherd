@@ -112,6 +112,7 @@ title: 'Home'
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/8.2.2/highcharts.min.js" integrity="sha512-rGbwX2HebD+8leyXLc1TjqjkMMYnsGHxV6Rr4Dl0qi6EqXKw8Ox72Dg75HpRXR3qly+TbmKV1SU81VWPPpHpcQ==" crossorigin="anonymous"></script>
 
 <script>
+{% set js %}
 {{ helpers.js | safe }}
 
 jQuery(document).ready(function($) {
@@ -293,5 +294,6 @@ jQuery(document).ready(function($) {
 function numberWithCommas(x) {
 	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
-
+{% endset %}
+{{ js | jsmin | safe }}
 </script>

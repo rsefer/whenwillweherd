@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-		"start": "npx @11ty/eleventy --serve --port=3000 & postcss _src/style/tailwind.css --o _tmp/style.css --watch",
-		"build": "ELEVENTY_PRODUCTION=true eleventy & NODE_ENV=production postcss _src/style/tailwind.css --o _site/style.css"
+    "start": "npx @11ty/eleventy --serve --port=3000 & postcss _src/style/tailwind.css --o _tmp/style.css --watch",
+    "build": "ELEVENTY_PRODUCTION=true eleventy & NODE_ENV=production postcss _src/style/tailwind.css --o _site/style.css"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +15,7 @@
     "axios": "^0.21.1",
     "csv-parse": "^4.15.0",
     "highcharts": "^8.2.2",
+    "html-minifier": "^4.0.0",
     "node-sass": "^5.0.0",
     "postcss-cli": "^8.3.1",
     "sass": "^1.32.5",
