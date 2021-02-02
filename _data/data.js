@@ -166,6 +166,14 @@ async function formatData() {
 		});
 		let rollingDaysCount = 7;
 		thisEntityObj.days.forEach((day, i) => {
+			// remove unused keys
+			delete day.total_distributed;
+			delete day.distributed_per_hundred;
+			delete day.people_vaccinated;
+			delete day.people_vaccinated_per_hundred;
+			delete day.daily_vaccinations_raw;
+			delete day.daily_vaccinations_per_million;
+			delete day.share_doses_used;
 			let rollingDaysSum = 0, rollingAverage = 0;
 			if (i > 0) {
 				let rollingDays = thisEntityObj.days.slice(Math.max(i - rollingDaysCount, 0), Math.min(i, thisEntityObj.days.length));
