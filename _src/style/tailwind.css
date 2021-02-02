@@ -14,5 +14,7 @@
 	display: inline-block;
 	vertical-align: middle;
 	margin-right: 0.5em;
+	width: auto;
+	min-width: 2em;
 	height: 1.25em;
 }
