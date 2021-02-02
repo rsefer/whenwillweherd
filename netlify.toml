@@ -1,5 +1,5 @@
 [build]
-	command = "ELEVENTY_PRODUCTION=true eleventy & NODE_ENV=production postcss _src/style/tailwind.css --o _site/style.css"
+	command = "ELEVENTY_PRODUCTION=true eleventy & NODE_ENV=production postcss _src/style/tailwind.css --o _site/style.css && cleancss _site/style.css -o _site/style.css"
 
 [build.environment]
   TZ = "America/Chicago"

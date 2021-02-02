@@ -1,11 +1,8 @@
 module.exports = {
 	purge: {
-		content: ['_site/**/*.html'],
-		options: {
-			safelist: [],
-		},
+		mode: 'all',
+		preserveHtmlElements: false,
+		content: ['_site/**/*.html']
 	},
-	darkMode: 'media',
-	variants: {},
-	plugins: [],
+	darkMode: 'media'
 };
