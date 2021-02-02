@@ -20,7 +20,7 @@ title: 'Home'
 
 <div class="container mx-auto py-6 md:py-12 px-6 md:px-6">
 	<div class="mx-auto max-w-sm">
-		<label for="select-state" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Select your State</label>
+		<label for="select-state" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Select your State:</label>
 		<select id="select-state" name="select-state" autocomplete="state" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
 			{% for state in data.formatted.entitiesList %}
 			{% if state == 'United States' %}{% else %}
@@ -54,7 +54,7 @@ title: 'Home'
 <div class="entity-template">
 	<div class="bg-white dark:bg-gray-500 dark:text-gray-300 shadow overflow-hidden rounded-md sm:rounded-lg">
 		<div class="bg-gray-200 dark:bg-gray-600 px-4 py-5 sm:px-6">
-			<h3 class="entity-title text-lg leading-6 font-medium text-gray-900 dark:text-gray-50"></h3>
+			<h3 class="entity-title text-center md:text-left text-lg leading-6 font-medium text-gray-900 dark:text-gray-50"></h3>
 		</div>
 		<div class="border-t border-gray-200 dark:border-green-500">
 			<dl>
@@ -214,6 +214,7 @@ jQuery(document).ready(function($) {
 				shared: true
 			}
 		});
+		var maxMultiplier = Math.min(entity.days[entity.days.length - 1].people_fully_vaccinated / entity.population * 2, 1);
 		Highcharts.chart('fully-chart-' + i, {
 			title: {
 				text: 'People Fully Vaccinated'
@@ -233,7 +234,8 @@ jQuery(document).ready(function($) {
 						text: 'People Fully Vaccinated'
 					},
 					min: 0,
-					max: entity.population,
+					max: entity.population * maxMultiplier,
+					tickAmount: 0,
 					endOnTick: false,
 					plotLines: [{
 						color: '#00ff00',
@@ -254,7 +256,7 @@ jQuery(document).ready(function($) {
 						text: 'Percentage'
 					},
 					min: 0,
-					max: 100,
+					max: 100 * maxMultiplier,
 					endOnTick: false,
 					opposite: true
 				}
@@ -262,21 +264,26 @@ jQuery(document).ready(function($) {
 			series: [
 				{
 					name: 'People Fully Vaccinated',
-					type: 'spline',
+					type: 'areaspline',
 					data: entity.days.map(day => [day.date, parseInt(day.people_fully_vaccinated)])
 				},
-				{
+				{ // only included for axis purposes
 					name: 'Percentage of Population',
 					type: 'line',
 					yAxis: 1,
+					visible: false,
 					data: entity.days.map(day => [
 						day.date,
-						Math.round((day.people_fully_vaccinated / entity.population * 100) * 100) / 100
+						day.people_fully_vaccinated / entity.population * 100
 					])
 				}
 			],
 			tooltip: {
-				shared: true
+				formatter: function(tooltip) {
+					var newTooltip = tooltip.defaultFormatter.call(this, tooltip);
+					newTooltip[2] = '<strong>' + (this.y / entity.population * 100).toFixed(2) + '% of population</strong>';
+					return newTooltip;
+				}
 			}
 		});
 	});
