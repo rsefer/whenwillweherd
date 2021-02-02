@@ -43,6 +43,7 @@ const populations = {
 	'Oklahoma': 3956971,
 	'Oregon': 4217737,
 	'Pennsylvania': 12801989,
+	'Puerto Rico': 3193694,
 	'Rhode Island': 1059361,
 	'South Carolina': 5148714,
 	'South Dakota': 884659,
@@ -54,8 +55,64 @@ const populations = {
 	'Washington': 7614893,
 	'West Virginia': 1792147,
 	'Wisconsin': 5822434,
-	'Wyoming': 578759,
-	'Puerto Rico': 3193694
+	'Wyoming': 578759
+};
+
+const abbreviations = {
+	'United States': 'US',
+	'Alabama': 'AL',
+	'Alaska': 'AK',
+	'Arizona': 'AZ',
+	'Arkansas': 'AR',
+	'California': 'CA',
+	'Colorado': 'CO',
+	'Connecticut': 'CT',
+	'Delaware': 'DE',
+	'District of Columbia': 'DC',
+	'Florida': 'FL',
+	'Georgia': 'GA',
+	'Hawaii': 'HI',
+	'Idaho': 'ID',
+	'Illinois': 'IL',
+	'Indiana': 'IN',
+	'Iowa': 'IA',
+	'Kansas': 'KS',
+	'Kentucky': 'KY',
+	'Louisiana': 'LA',
+	'Maine': 'ME',
+	'Maryland': 'MD',
+	'Massachusetts': 'MA',
+	'Michigan': 'MI',
+	'Minnesota': 'MN',
+	'Mississippi': 'MS',
+	'Missouri': 'MO',
+	'Montana': 'MT',
+	'Nebraska': 'NE',
+	'Nevada': 'NV',
+	'New Hampshire': 'NH',
+	'New Jersey': 'NJ',
+	'New Mexico': 'NM',
+	'New York': 'NY',
+	'New York State': 'NY',
+	'North Carolina': 'NC',
+	'North Dakota': 'ND',
+	'Ohio': 'OH',
+	'Oklahoma': 'OK',
+	'Oregon': 'OR',
+	'Pennsylvania': 'PA',
+	'Puerto Rico': 'PR',
+	'Rhode Island': 'RI',
+	'South Carolina': 'SC',
+	'South Dakota': 'SD',
+	'Tennessee': 'TN',
+	'Texas': 'TX',
+	'Utah': 'UT',
+	'Vermont': 'VT',
+	'Virginia': 'VA',
+	'Washington': 'WA',
+	'West Virginia': 'WV',
+	'Wyoming': 'WY',
+	'Wisconsin': 'WI'
 };
 
 async function getData() {
@@ -79,6 +136,7 @@ async function formatData() {
 		entitiesList: [],
 		herdPercentage: 0.75,
 		populations: populations,
+		abbreviations: abbreviations,
 		labels: {
 			lastXDays: `Last ${keepLastCount} Days`
 		}
@@ -96,7 +154,8 @@ async function formatData() {
 			days: [],
 			total_vaccinations: 0,
 			rolling_average_7: 0,
-			population: formattedData.populations[entity]
+			population: formattedData.populations[entity],
+			abbreviation: formattedData.abbreviations[entity]
 		};
 		thisEntityObj.herd_population = thisEntityObj.population * formattedData.herdPercentage;
 		parsed.filter((row) => row[1] == entity).forEach((row, i) => {

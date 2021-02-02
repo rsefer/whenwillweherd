@@ -9,3 +9,10 @@
 .highcharts-plot-line {
 	stroke-dasharray: 4;
 }
+
+.entity-title img {
+	display: inline-block;
+	vertical-align: middle;
+	margin-right: 0.5em;
+	height: 1.25em;
+}

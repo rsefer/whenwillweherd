@@ -159,6 +159,9 @@ jQuery(document).ready(function($) {
 		entityBlock.find('.vaccinations-chart').attr('id', 'vaccinations-chart-' + i);
 		entityBlock.find('.fully-chart').attr('id', 'fully-chart-' + i);
 		entityBlock.find('.entity-title').text(entity.name);
+		if (entity.abbreviation) {
+			entityBlock.find('.entity-title').prepend('<img src="/images/flags/' + entity.abbreviation.toLowerCase() + '.svg">');
+		}
 		entityBlock.find('.entity-population').text(numberWithCommas(entity.population));
 		entityBlock.find('.entity-vacs-given').text(numberWithCommas(entity.total_vaccinations));
 		entityBlock.find('.entity-vacs-per-100').text(entity.total_vaccinations_per_hundred);
