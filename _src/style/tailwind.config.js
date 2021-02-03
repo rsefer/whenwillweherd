@@ -4,5 +4,10 @@ module.exports = {
 		preserveHtmlElements: false,
 		content: ['_site/**/*.html']
 	},
-	darkMode: 'media'
+	darkMode: 'media',
+	variants: {
+		extend: {
+			padding: ['dark']
+		}
+	}
 };

@@ -18,18 +18,8 @@ title: 'Home'
   </div>
 </div>
 
-<div class="container mx-auto py-6 md:py-12 px-6 md:px-6">
-	<div class="mx-auto max-w-sm">
-		<label for="select-state" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Select your State:</label>
-		<select id="select-state" name="select-state" autocomplete="state" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-			{% for state in data.formatted.entitiesList %}
-			{% if state == 'United States' %}{% else %}
-			<option value="{{ state }}">{% if state == 'New York State' %}New York{% else %}{{ state }}{% endif %}</option>
-			{% endif %}
-			{% endfor %}
-		</select>
-	</div>
-	<div id="charts-wrap" class="charts-wrap grid grid-cols-1 md:grid-cols-2 gap-12 mt-6"></div>
+<div class="container mx-auto p-6 pb-6 md:pt-12 md:pb-12 md:px-4 dark:pt-3 md:dark:pt-0">
+	<div id="charts-wrap" class="charts-wrap grid grid-cols-1 md:grid-cols-2 gap-12"></div>
 </div>
 
 <div id="notes" class="bg-gray-50 dark:bg-gray-800 p-12">
@@ -53,8 +43,18 @@ title: 'Home'
 
 <div class="entity-template">
 	<div class="bg-white dark:bg-gray-500 dark:text-gray-300 shadow overflow-hidden rounded-md sm:rounded-lg">
-		<div class="bg-gray-200 dark:bg-gray-600 px-4 py-5 sm:px-6">
-			<h3 class="entity-title text-center md:text-left text-lg leading-6 font-medium text-gray-900 dark:text-gray-50"></h3>
+		<div class="bg-gray-200 dark:bg-gray-600 px-4 py-5 sm:px-6 sm:flex justify-between items-center sm:gap-4">
+			<h3 class="entity-title flex-grow text-center sm:text-left text-lg leading-6 font-medium text-gray-900 dark:text-gray-50"></h3>
+			<div class="entity-selection mt-4 sm:mt-0 flex-grow-0">
+				<select id="select-state" name="select-state" autocomplete="state" class="block w-full py-2 px-2 sm:py-0 sm:py-0 border border-gray-300 bg-white text-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+					<option>State</option>
+					{% for state in data.formatted.entitiesList %}
+					{% if state == 'United States' %}{% else %}
+					<option value="{{ state }}">{% if state == 'New York State' %}New York{% else %}{{ state }}{% endif %}</option>
+					{% endif %}
+					{% endfor %}
+				</select>
+			</div>
 		</div>
 		<div class="border-t border-gray-200 dark:border-green-500">
 			<dl>
@@ -120,7 +120,6 @@ jQuery(document).ready(function($) {
 	if (stateName == 'New York') {
 		stateName = 'New York State';
 	}
-	$('#select-state').val(stateName);
 
 	$('body').on('change', '#select-state', function() {
 		window.location.href = '/?state=' + this.value;
@@ -155,6 +154,10 @@ jQuery(document).ready(function($) {
 		var entityTemplate = $('.entity-template').html();
 		$('#charts-wrap').append('<div id="entity-' + i + '" class="entity">' + entityTemplate + '</div>');
 		var entityBlock = $('#entity-' + i);
+		if (entity.name == 'United States') {
+			entityBlock.find('.entity-selection').remove();
+			entityBlock.find('.entity-title').addClass('sm:text-center');
+		}
 		entityBlock.find('.vaccinations-chart').attr('id', 'vaccinations-chart-' + i);
 		entityBlock.find('.fully-chart').attr('id', 'fully-chart-' + i);
 		entityBlock.find('.entity-title').text(entity.name);
