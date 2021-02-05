@@ -207,12 +207,12 @@ jQuery(document).ready(function($) {
 				{
 					name: 'Daily Vaccinations',
 					type: 'column',
-					data: entity.days.map(day => [day.date, parseInt(day.daily_vaccinations)])
+					data: entity.days.map(day => [day.date, parseInt(day.daily_vaccinations_raw)])
 				},
 				{
 					name: '7 Day Rolling Average',
 					type: 'spline',
-					data: entity.days.map(day => [day.date, parseInt(day.rolling_average_7)])
+					data: entity.days.map(day => [day.date, parseInt(day.daily_vaccinations)])
 				}
 			],
 			tooltip: {

@@ -164,18 +164,10 @@ async function formatData() {
 			row.map((cell, x) => day[cols[x]] = cell);
 			thisEntityObj.days.push(day);
 		});
-		let rollingDaysCount = 7;
 		thisEntityObj.days.forEach((day, i) => {
-			let rollingDaysSum = 0, rollingAverage = 0;
-			if (i > 0) {
-				let rollingDays = thisEntityObj.days.slice(Math.max(i - rollingDaysCount, 0), Math.min(i, thisEntityObj.days.length));
-				rollingDays.map((rd) => rollingDaysSum += parseInt(rd.daily_vaccinations || 0));
-				rollingAverage = Math.ceil(rollingDaysSum / rollingDays.length);
-				day.rolling_average_7 = rollingAverage;
-			}
 			if (i == thisEntityObj.days.length - 1) {
 				thisEntityObj.total_vaccinations = parseInt(day.total_vaccinations);
-				thisEntityObj.rolling_average_7 = rollingAverage;
+				thisEntityObj.rolling_average_7 = day.daily_vaccinations;
 				thisEntityObj.total_vaccinations_per_hundred = parseFloat(day.total_vaccinations_per_hundred);
 				formattedData.lastDate = day.date;
 			}
@@ -186,8 +178,7 @@ async function formatData() {
 			delete day.people_vaccinated;
 			delete day.people_vaccinated_per_hundred;
 			delete day.people_vaccinated_per_hundred;
-			delete day.people_fully_vaccinated_per_hundred
-			delete day.daily_vaccinations_raw;
+			delete day.people_fully_vaccinated_per_hundred;
 			delete day.daily_vaccinations_per_million;
 			delete day.share_doses_used;
 		});
