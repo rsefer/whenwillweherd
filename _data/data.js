@@ -2,7 +2,7 @@ const axios = require('axios');
 const parse = require('csv-parse/lib/sync');
 const url = 'https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/us_state_vaccinations.csv';
 const populations = {
-	'United States': 328239523,
+	'United States': 331996199,
 	'Alabama': 4903185,
 	'Alaska': 731545,
 	'Arizona': 7278717,
