@@ -48,7 +48,7 @@ title: 'Home'
 			<h3 class="entity-title flex-grow text-center sm:text-left text-lg leading-6 font-medium text-gray-900 dark:text-gray-50"></h3>
 			<div class="entity-selection mt-4 sm:mt-0 flex-grow-0">
 				<select id="select-state" name="select-state" autocomplete="state" class="block w-full py-2 px-2 sm:py-0 sm:py-0 border border-gray-300 bg-white text-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-					<option>State</option>
+					<option>Select State</option>
 					{% for state in data.formatted.entitiesList %}
 					{% if state == 'United States' %}{% else %}
 					<option value="{{ state }}">{% if state == 'New York State' %}New York{% else %}{{ state }}{% endif %}</option>
@@ -61,11 +61,11 @@ title: 'Home'
 			<dl>
 				<div class="bg-green-300 dark:bg-green-500 px-4 py-5 grid grid-cols-2 sm:gap-4 sm:px-6">
 					<dt class="text-sm font-medium text-gray-600 dark:text-white">
-						Herd Immunity<br>
+						<span class="font-semibold">Herd Immunity</span><br>
 						<small>({{ data.formatted.herdPercentageLabel }}% of the population)</small>
 					</dt>
 					<dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 text-right">
-						<div class="entity-herd-date-double"></div>
+						<div class="entity-herd-date-double font-bold"></div>
 						<div style="display: none;"><small><em>(<span class="entity-herd-days-needed-double"></span> days)</em></small></div>
 					</dd>
 				</div>
@@ -207,12 +207,12 @@ jQuery(document).ready(function($) {
 				{
 					name: 'Daily Vaccinations',
 					type: 'column',
-					data: entity.days.map(day => [day.date, parseInt(day.daily_vaccinations_raw)])
+					data: entity.days.map(day => [day.date, day.daily_vaccinations_raw])
 				},
 				{
 					name: '7 Day Rolling Average',
 					type: 'spline',
-					data: entity.days.map(day => [day.date, parseInt(day.daily_vaccinations)])
+					data: entity.days.map(day => [day.date, day.daily_vaccinations])
 				}
 			],
 			tooltip: {
@@ -240,10 +240,10 @@ jQuery(document).ready(function($) {
 					},
 					min: 0,
 					max: entity.population * maxMultiplier,
-					tickAmount: 0,
 					endOnTick: false,
+					gridLineWidth: 0,
 					plotLines: [{
-						color: '#00ff00',
+						color: '#11ba82',
 						label: {
 							text: 'HERD',
 							align: 'left',
@@ -258,11 +258,12 @@ jQuery(document).ready(function($) {
 				},
 				{
 					title: {
-						text: 'Percentage'
+						text: '% of Population'
 					},
 					min: 0,
 					max: 100 * maxMultiplier,
 					endOnTick: false,
+					gridLineColor: '#c7c7c7',
 					opposite: true
 				}
 			],
@@ -270,17 +271,15 @@ jQuery(document).ready(function($) {
 				{
 					name: 'People Fully Vaccinated',
 					type: 'areaspline',
-					data: entity.days.map(day => [day.date, parseInt(day.people_fully_vaccinated)])
+					data: entity.days.map(day => [day.date, day.people_fully_vaccinated]),
+					color: '#11ba82'
 				},
 				{ // only included for axis purposes
 					name: 'Percentage of Population',
 					type: 'line',
 					yAxis: 1,
 					visible: false,
-					data: entity.days.map(day => [
-						day.date,
-						day.people_fully_vaccinated / entity.population * 100
-					])
+					data: entity.days.map(day => [day.date, day.people_fully_vaccinated_per_hundred])
 				}
 			],
 			tooltip: {

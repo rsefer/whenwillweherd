@@ -159,9 +159,13 @@ async function formatData() {
 		};
 		thisEntityObj.herd_population = thisEntityObj.population * formattedData.herdPercentage;
 		parsed.filter((row) => row[1] == entity).forEach((row, i) => {
-			let dayLabel = `${row[0]}-${row[1]}`;
 			let day = {};
 			row.map((cell, x) => day[cols[x]] = cell);
+			day.total_vaccinations = parseFloat(day.total_vaccinations);
+			day.people_fully_vaccinated = parseFloat(day.people_fully_vaccinated);
+			day.people_fully_vaccinated_per_hundred = parseFloat(day.people_fully_vaccinated_per_hundred);
+			day.daily_vaccinations_raw = parseFloat(day.daily_vaccinations_raw);
+			day.daily_vaccinations = parseFloat(day.daily_vaccinations);
 			thisEntityObj.days.push(day);
 		});
 		thisEntityObj.days.forEach((day, i) => {
@@ -177,8 +181,6 @@ async function formatData() {
 			delete day.total_vaccinations_per_hundred;
 			delete day.people_vaccinated;
 			delete day.people_vaccinated_per_hundred;
-			delete day.people_vaccinated_per_hundred;
-			delete day.people_fully_vaccinated_per_hundred;
 			delete day.daily_vaccinations_per_million;
 			delete day.share_doses_used;
 		});
