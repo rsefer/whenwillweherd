@@ -133,7 +133,6 @@ async function formatData() {
 	let keepLastCount = 14;
 	let formattedData = {
 		entities: [],
-		entitiesList: [],
 		herdPercentage: 0.75,
 		populations: populations,
 		abbreviations: abbreviations,
@@ -146,8 +145,6 @@ async function formatData() {
 	for (var entity of entities) {
 		if (!Object.keys(formattedData.populations).includes(entity)) {
 			continue;
-		} else {
-			formattedData.entitiesList.push(entity);
 		}
 		let thisEntityObj = {
 			name: entity,
@@ -163,7 +160,6 @@ async function formatData() {
 			row.map((cell, x) => day[cols[x]] = cell);
 			day.total_vaccinations = parseFloat(day.total_vaccinations);
 			day.people_fully_vaccinated = parseFloat(day.people_fully_vaccinated);
-			day.people_fully_vaccinated_per_hundred = parseFloat(day.people_fully_vaccinated_per_hundred);
 			day.daily_vaccinations_raw = parseFloat(day.daily_vaccinations_raw);
 			day.daily_vaccinations = parseFloat(day.daily_vaccinations);
 			thisEntityObj.days.push(day);
@@ -176,11 +172,13 @@ async function formatData() {
 				formattedData.lastDate = day.date;
 			}
 			// remove unused keys
+			delete day.location;
 			delete day.total_distributed;
 			delete day.distributed_per_hundred;
 			delete day.total_vaccinations_per_hundred;
 			delete day.people_vaccinated;
 			delete day.people_vaccinated_per_hundred;
+			delete day.people_fully_vaccinated_per_hundred;
 			delete day.daily_vaccinations_per_million;
 			delete day.share_doses_used;
 		});
@@ -208,7 +206,6 @@ async function formatData() {
 		thisEntityObj.days.splice(0, thisEntityObj.days.length - keepLastCount);
 		formattedData.entities.push(thisEntityObj);
 	}
-	formattedData.entitiesList = formattedData.entitiesList.filter((v, i, a) => a.indexOf(v) === i);
 
 	delete formattedData.abbreviations;
 	delete formattedData.populations;

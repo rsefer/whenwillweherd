@@ -49,9 +49,9 @@ title: 'Home'
 			<div class="entity-selection mt-4 sm:mt-0 flex-grow-0">
 				<select id="select-state" name="select-state" autocomplete="state" class="block w-full py-2 px-2 sm:py-0 sm:py-0 border border-gray-300 bg-white text-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
 					<option>Select State</option>
-					{% for state in data.formatted.entitiesList %}
-					{% if state == 'United States' %}{% else %}
-					<option value="{{ state }}">{% if state == 'New York State' %}New York{% else %}{{ state }}{% endif %}</option>
+					{% for entity in data.formatted.entities %}
+					{% if entity.name == 'United States' %}{% else %}
+					<option value="{{ entity.name }}">{% if entity.name == 'New York State' %}New York{% else %}{{ entity.name }}{% endif %}</option>
 					{% endif %}
 					{% endfor %}
 				</select>
@@ -279,7 +279,7 @@ jQuery(document).ready(function($) {
 					type: 'line',
 					yAxis: 1,
 					visible: false,
-					data: entity.days.map(day => [day.date, day.people_fully_vaccinated_per_hundred])
+					data: entity.days.map(day => [day.date, (day.people_fully_vaccinated / entity.population) * 100])
 				}
 			],
 			tooltip: {
