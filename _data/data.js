@@ -209,6 +209,10 @@ async function formatData() {
 		formattedData.entities.push(thisEntityObj);
 	}
 	formattedData.entitiesList = formattedData.entitiesList.filter((v, i, a) => a.indexOf(v) === i);
+
+	delete formattedData.abbreviations;
+	delete formattedData.populations;
+
 	return {
 		timestamp: new Date(),
 		formatted: formattedData,
