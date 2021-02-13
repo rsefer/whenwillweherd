@@ -68,6 +68,14 @@ title: 'Home'
 						<div class="entity-herd-date-double font-bold"></div>
 						<div style="display: none;"><small><em>(<span class="entity-herd-days-needed-double"></span> days)</em></small></div>
 					</dd>
+					<!-- <dt class="text-sm font-medium text-gray-600 dark:text-white">
+						<span class="font-semibold">Herd Immunity Fully Vaccinated</span><br>
+						<small>({{ data.formatted.herdPercentageLabel }}% of the population)</small>
+					</dt>
+					<dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 text-right">
+						<div class="entity-herd-date-fully font-bold"></div>
+						<div style="display: none;"><small><em>(<span class="entity-herd-days-needed-fully"></span> days)</em></small></div>
+					</dd> -->
 				</div>
 			</dl>
 		</div>
@@ -178,6 +186,9 @@ jQuery(document).ready(function($) {
 		if (entity.herd_vacs_needed_double) {
 			entityBlock.find('.entity-herd-remaining-vacs-needed-double').text(numberWithCommas(entity.herd_vacs_needed_double));
 		}
+
+		// entityBlock.find('.entity-herd-date-fully').text(entity.herd_date_fully_label);
+		// entityBlock.find('.entity-herd-days-needed-fully').text(entity.herd_days_needed_fully);
 
 		// // complete
 		// entityBlock.find('.entity-completion-date-double').text(entity.completion_date_double_label);

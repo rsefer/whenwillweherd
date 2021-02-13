@@ -151,6 +151,7 @@ async function formatData() {
 			days: [],
 			total_vaccinations: 0,
 			rolling_average_7: 0,
+			people_fully_vaccinated_rolling_average_7: 0,
 			population: formattedData.populations[entity],
 			abbreviation: formattedData.abbreviations[entity]
 		};
@@ -165,11 +166,15 @@ async function formatData() {
 			thisEntityObj.days.push(day);
 		});
 		thisEntityObj.days.forEach((day, i) => {
+			if (i > 0) {
+				day.people_fully_vaccinated_today = day.people_fully_vaccinated - thisEntityObj.days[i - 1].people_fully_vaccinated;
+			}
 			if (i == thisEntityObj.days.length - 1) {
 				thisEntityObj.total_vaccinations = parseInt(day.total_vaccinations);
 				thisEntityObj.rolling_average_7 = day.daily_vaccinations;
 				thisEntityObj.total_vaccinations_per_hundred = parseFloat(day.total_vaccinations_per_hundred);
 				formattedData.lastDate = day.date;
+				thisEntityObj.people_fully_vaccinated = day.people_fully_vaccinated;
 			}
 			// remove unused keys
 			delete day.location;
@@ -186,6 +191,10 @@ async function formatData() {
 			const today = new Date();
 			thisEntityObj.population = populations[thisEntityObj.name];
 
+			thisEntityObj.people_fully_vaccinated_rolling_average_7 = Math.round(thisEntityObj.days.slice(Math.max(thisEntityObj.days.length - 7, 0)).reduce((accumulator, currentValue) => {
+				return accumulator + currentValue.people_fully_vaccinated_today
+			}, 0) / 7);
+
 			// herd
 			thisEntityObj.herd_vacs_needed_double = Math.ceil((thisEntityObj.population * 2 * formattedData.herdPercentage) - thisEntityObj.total_vaccinations);
 			thisEntityObj.herd_days_needed_double = Math.ceil(thisEntityObj.herd_vacs_needed_double / thisEntityObj.rolling_average_7);
@@ -193,6 +202,13 @@ async function formatData() {
 			herdDateDouble.setDate(today.getDate() + thisEntityObj.herd_days_needed_double);
 			thisEntityObj.herd_date_double = herdDateDouble;
 			thisEntityObj.herd_date_double_label = roughDate(thisEntityObj.herd_date_double);
+
+			thisEntityObj.herd_people_needed_fully = Math.ceil((thisEntityObj.population * 2 * formattedData.herdPercentage) - thisEntityObj.people_fully_vaccinated);
+			thisEntityObj.herd_days_needed_fully = Math.ceil(thisEntityObj.herd_people_needed_fully / thisEntityObj.people_fully_vaccinated_rolling_average_7);
+			let herdDateFully = new Date();
+			herdDateFully.setDate(today.getDate() + thisEntityObj.herd_days_needed_fully);
+			thisEntityObj.herd_date_fully = herdDateFully;
+			thisEntityObj.herd_date_fully_label = roughDate(thisEntityObj.herd_date_fully);
 
 			// // complete
 			// thisEntityObj.completion_vacs_needed_double = Math.ceil((thisEntityObj.population * 2) - thisEntityObj.total_vaccinations);
