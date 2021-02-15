@@ -42,79 +42,83 @@ title: 'Home'
 	</div>
 </div>
 
-<div class="entity-template">
-	<div class="bg-white dark:bg-gray-500 dark:text-gray-300 shadow overflow-hidden rounded-md sm:rounded-lg">
-		<div class="bg-gray-200 dark:bg-gray-600 px-4 py-5 sm:px-6 sm:flex justify-between items-center sm:gap-4">
-			<h3 class="entity-title flex-grow text-center sm:text-left text-lg leading-6 font-medium text-gray-900 dark:text-gray-50"></h3>
-			<div class="entity-selection mt-4 sm:mt-0 flex-grow-0">
-				<select id="select-state" name="select-state" autocomplete="state" class="block w-full py-2 px-2 sm:py-0 sm:py-0 border border-gray-300 bg-white text-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-					<option>Select State</option>
-					{% for entity in data.formatted.entities %}
-					{% if entity.name == 'United States' %}{% else %}
-					<option value="{{ entity.name }}">{% if entity.name == 'New York State' %}New York{% else %}{{ entity.name }}{% endif %}</option>
-					{% endif %}
-					{% endfor %}
-				</select>
+<div aria-hidden="true">
+
+	<div class="entity-template">
+		<div class="bg-white dark:bg-gray-500 dark:text-gray-300 shadow overflow-hidden rounded-md sm:rounded-lg">
+			<div class="bg-gray-200 dark:bg-gray-600 px-4 py-5 sm:px-6 sm:flex justify-between items-center sm:gap-4">
+				<div class="entity-title flex-grow text-center sm:text-left text-lg leading-6 font-medium text-gray-900 dark:text-gray-50"></div>
+				<div class="entity-selection mt-4 sm:mt-0 flex-grow-0">
+					<select name="select-state" autocomplete="state" class="block w-full py-2 px-2 sm:py-0 sm:py-0 border border-gray-300 bg-white text-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+						<option>Select State</option>
+						{% for entity in data.formatted.entities %}
+						{% if entity.name == 'United States' %}{% else %}
+						<option value="{{ entity.name }}">{% if entity.name == 'New York State' %}New York{% else %}{{ entity.name }}{% endif %}</option>
+						{% endif %}
+						{% endfor %}
+					</select>
+				</div>
 			</div>
-		</div>
-		<div class="border-t border-gray-200 dark:border-green-500">
-			<dl>
-				<div class="bg-green-300 dark:bg-green-500 px-4 py-5 grid grid-cols-2 sm:gap-4 sm:px-6">
-					<dt class="text-sm font-medium text-gray-600 dark:text-white">
-						<span class="font-semibold">Herd Immunity</span><br>
-						<small>({{ data.formatted.herdPercentageLabel }}% of the population)</small>
+			<div class="border-t border-gray-200 dark:border-green-500">
+				<dl>
+					<div class="bg-green-300 dark:bg-green-500 px-4 py-5 grid grid-cols-2 sm:gap-4 sm:px-6">
+						<dt class="text-sm font-medium text-gray-600 dark:text-white">
+							<span class="font-semibold">Herd Immunity</span><br>
+							<small>({{ data.formatted.herdPercentageLabel }}% of the population)</small>
+						</dt>
+						<dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 text-right">
+							<div class="entity-herd-date-double font-bold"></div>
+							<div style="display: none;"><small><em>(<span class="entity-herd-days-needed-double"></span> days)</em></small></div>
+						</dd>
+						<dt class="fully-vacinated-el text-sm font-medium text-gray-600 dark:text-white">
+							<span class="font-semibold">Herd Immunity Fully Vaccinated</span><br>
+							<small>({{ data.formatted.herdPercentageLabel }}% of the population)</small>
+						</dt>
+						<dd class="fully-vacinated-el mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 text-right">
+							<div class="entity-herd-date-fully font-bold"></div>
+							<div style="display: none;"><small><em>(<span class="entity-herd-days-needed-fully"></span> days)</em></small></div>
+						</dd>
+					</div>
+				</dl>
+			</div>
+			<div class="vaccinations-chart bg-white pt-6 pb-2 md:px-6"></div>
+			<dl class="border-t border-b border-gray-200">
+				<div class="px-4 py-5 grid grid-cols-2 sm:gap-4 sm:px-6">
+					<dt class="text-sm font-medium text-gray-600 dark:text-gray-50">
+						Population
 					</dt>
-					<dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 text-right">
-						<div class="entity-herd-date-double font-bold"></div>
-						<div style="display: none;"><small><em>(<span class="entity-herd-days-needed-double"></span> days)</em></small></div>
+					<dd class="entity-population mt-1 text-sm text-gray-900 dark:text-gray-50 sm:mt-0 text-right">
 					</dd>
-					<dt class="fully-vacinated-el text-sm font-medium text-gray-600 dark:text-white">
-						<span class="font-semibold">Herd Immunity Fully Vaccinated</span><br>
-						<small>({{ data.formatted.herdPercentageLabel }}% of the population)</small>
+				</div>
+				<div class="px-4 py-5 grid grid-cols-2 sm:gap-4 sm:px-6">
+					<dt class="text-sm font-medium text-gray-600 dark:text-gray-50">
+						Vaccinations Given
 					</dt>
-					<dd class="fully-vacinated-el mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 text-right">
-						<div class="entity-herd-date-fully font-bold"></div>
-						<div style="display: none;"><small><em>(<span class="entity-herd-days-needed-fully"></span> days)</em></small></div>
+					<dd class="mt-1 text-sm text-gray-900 dark:text-gray-50 sm:mt-0 text-right">
+						<div class="entity-vacs-given"></div>
+						<div><small><em>(<span class="entity-vacs-per-100"></span> per 100)</em></small></div>
+					</dd>
+				</div>
+				<div class="px-4 py-5 grid grid-cols-2 sm:gap-4 sm:px-6">
+					<dt class="text-sm font-medium text-gray-600 dark:text-gray-50">
+						7 Day Rolling Average
+					</dt>
+					<dd class="entity-7-day-rolling-average mt-1 text-sm text-gray-900 dark:text-gray-50 sm:mt-0 text-right">
+					</dd>
+				</div>
+				<div class="px-4 py-5 grid grid-cols-2 sm:gap-4 sm:px-6">
+					<dt class="text-sm font-medium text-gray-600 dark:text-gray-50">
+						Remaining Vaccinations Needed<br>
+						<small>(assuming Double Dosage)</small>
+					</dt>
+					<dd class="entity-herd-remaining-vacs-needed-double mt-1 text-sm text-gray-900 dark:text-gray-50 sm:mt-0 text-right">
 					</dd>
 				</div>
 			</dl>
+			<div class="fully-chart bg-white pt-6 pb-2 md:px-6"></div>
 		</div>
-		<div class="vaccinations-chart bg-white pt-6 pb-2 md:px-6"></div>
-		<dl class="border-t border-b border-gray-200">
-			<div class="px-4 py-5 grid grid-cols-2 sm:gap-4 sm:px-6">
-				<dt class="text-sm font-medium text-gray-600 dark:text-gray-50">
-					Population
-				</dt>
-				<dd class="entity-population mt-1 text-sm text-gray-900 dark:text-gray-50 sm:mt-0 text-right">
-				</dd>
-			</div>
-			<div class="px-4 py-5 grid grid-cols-2 sm:gap-4 sm:px-6">
-				<dt class="text-sm font-medium text-gray-600 dark:text-gray-50">
-					Vaccinations Given
-				</dt>
-				<dd class="mt-1 text-sm text-gray-900 dark:text-gray-50 sm:mt-0 text-right">
-					<div class="entity-vacs-given"></div>
-					<div><small><em>(<span class="entity-vacs-per-100"></span> per 100)</em></small></div>
-				</dd>
-			</div>
-			<div class="px-4 py-5 grid grid-cols-2 sm:gap-4 sm:px-6">
-				<dt class="text-sm font-medium text-gray-600 dark:text-gray-50">
-					7 Day Rolling Average
-				</dt>
-				<dd class="entity-7-day-rolling-average mt-1 text-sm text-gray-900 dark:text-gray-50 sm:mt-0 text-right">
-				</dd>
-			</div>
-			<div class="px-4 py-5 grid grid-cols-2 sm:gap-4 sm:px-6">
-				<dt class="text-sm font-medium text-gray-600 dark:text-gray-50">
-					Remaining Vaccinations Needed<br>
-					<small>(assuming Double Dosage)</small>
-				</dt>
-				<dd class="entity-herd-remaining-vacs-needed-double mt-1 text-sm text-gray-900 dark:text-gray-50 sm:mt-0 text-right">
-				</dd>
-			</div>
-		</dl>
-		<div class="fully-chart bg-white pt-6 pb-2 md:px-6"></div>
 	</div>
+
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -132,7 +136,7 @@ jQuery(document).ready(function($) {
 		stateName = 'New York State';
 	}
 
-	$('body').on('change', '#select-state', function() {
+	$('body').on('change', '.select-state', function() {
 		window.location.href = '/?state=' + this.value;
 	});
 
@@ -189,8 +193,6 @@ jQuery(document).ready(function($) {
 
 		entityBlock.find('.entity-herd-date-fully').text(entity.herd_date_fully_label);
 		entityBlock.find('.entity-herd-days-needed-fully').text(entity.herd_days_needed_fully);
-
-		console.log(urlParams.get('fully'));
 
 		if (urlParams.get('fully') == 'true') {
 			$('.fully-vacinated-el').show();
