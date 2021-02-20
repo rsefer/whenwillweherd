@@ -136,7 +136,7 @@ jQuery(document).ready(function($) {
 		stateName = 'New York State';
 	}
 
-	$('body').on('change', '.select-state', function() {
+	$('body').on('change', '[name="select-state"]', function() {
 		window.location.href = '/?state=' + this.value;
 	});
 
