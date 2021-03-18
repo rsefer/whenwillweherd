@@ -29,7 +29,6 @@ title: 'Home'
 		<ul class="text-gray-600 dark:text-gray-300 mt-3 list-disc">
 			<li>This site is intended to act as quick reference to the latest vaccination data. There are almost certainly inaccuracies in the data, calculations, and guesses. <strong>Please refer to CDC guidelines for more accurate information.</strong></li>
 			<li>As vaccination administration ramps up and the 7 Day Rolling Average changes, the herd immunity date will also change. This date is purely an educated guess/estimate based on available data.</li>
-			<li>Single dosage vaccines (such as the Johnson &amp; Johnson vaccine) are not currently taken into account for the herd prediction.</li>
 		</ul>
 	</div>
 </div>
@@ -70,6 +69,14 @@ title: 'Home'
 							<div class="entity-herd-date-double font-bold"></div>
 							<div style="display: none;"><small><em>(<span class="entity-herd-days-needed-double"></span> days)</em></small></div>
 						</dd>
+						<dt class="single-vacinated-el text-sm font-medium text-gray-600 dark:text-white">
+							<span class="font-semibold">Herd Immunity Single Vaccinated</span><br>
+							<small>({{ data.formatted.herdPercentageLabel }}% of the population)</small>
+						</dt>
+						<dd class="single-vacinated-el mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 text-right">
+							<div class="entity-herd-date-single font-bold"></div>
+							<div style="display: none;"><small><em>(<span class="entity-herd-days-needed-single"></span> days)</em></small></div>
+						</dd>
 						<dt class="fully-vacinated-el text-sm font-medium text-gray-600 dark:text-white">
 							<span class="font-semibold">Herd Immunity Fully Vaccinated</span><br>
 							<small>({{ data.formatted.herdPercentageLabel }}% of the population)</small>
@@ -92,29 +99,15 @@ title: 'Home'
 				</div>
 				<div class="px-4 py-5 grid grid-cols-2 sm:gap-4 sm:px-6">
 					<dt class="text-sm font-medium text-gray-600 dark:text-gray-50">
-						Vaccinations Given
+						Doses Given
 					</dt>
 					<dd class="mt-1 text-sm text-gray-900 dark:text-gray-50 sm:mt-0 text-right">
 						<div class="entity-vacs-given"></div>
 						<div><small><em>(<span class="entity-vacs-per-100"></span> per 100)</em></small></div>
 					</dd>
 				</div>
-				<div class="px-4 py-5 grid grid-cols-2 sm:gap-4 sm:px-6">
-					<dt class="text-sm font-medium text-gray-600 dark:text-gray-50">
-						7 Day Rolling Average
-					</dt>
-					<dd class="entity-7-day-rolling-average mt-1 text-sm text-gray-900 dark:text-gray-50 sm:mt-0 text-right">
-					</dd>
-				</div>
-				<div class="px-4 py-5 grid grid-cols-2 sm:gap-4 sm:px-6">
-					<dt class="text-sm font-medium text-gray-600 dark:text-gray-50">
-						Remaining Vaccinations Needed<br>
-						<small>(assuming Double Dosage)</small>
-					</dt>
-					<dd class="entity-herd-remaining-vacs-needed-double mt-1 text-sm text-gray-900 dark:text-gray-50 sm:mt-0 text-right">
-					</dd>
-				</div>
 			</dl>
+			<div class="single-chart bg-white pt-6 pb-2 md:px-6"></div>
 			<div class="fully-chart bg-white pt-6 pb-2 md:px-6"></div>
 		</div>
 	</div>
@@ -174,6 +167,7 @@ jQuery(document).ready(function($) {
 			entityBlock.find('.entity-title').addClass('sm:text-center');
 		}
 		entityBlock.find('.vaccinations-chart').attr('id', 'vaccinations-chart-' + i);
+		entityBlock.find('.single-chart').attr('id', 'single-chart-' + i);
 		entityBlock.find('.fully-chart').attr('id', 'fully-chart-' + i);
 		entityBlock.find('.entity-title').text(entity.name);
 		if (entity.abbreviation) {
@@ -182,14 +176,13 @@ jQuery(document).ready(function($) {
 		entityBlock.find('.entity-population').text(numberWithCommas(entity.population));
 		entityBlock.find('.entity-vacs-given').text(numberWithCommas(entity.total_vaccinations));
 		entityBlock.find('.entity-vacs-per-100').text(entity.total_vaccinations_per_hundred);
-		entityBlock.find('.entity-7-day-rolling-average').text(numberWithCommas(entity.rolling_average_7));
 
 		// herd
 		entityBlock.find('.entity-herd-date-double').text(entity.herd_date_double_label);
 		entityBlock.find('.entity-herd-days-needed-double').text(entity.herd_days_needed_double);
-		if (entity.herd_vacs_needed_double) {
-			entityBlock.find('.entity-herd-remaining-vacs-needed-double').text(numberWithCommas(entity.herd_vacs_needed_double));
-		}
+
+		entityBlock.find('.entity-herd-date-single').text(entity.herd_date_label);
+		entityBlock.find('.entity-herd-days-needed-single').text(entity.herd_days_needed);
 
 		entityBlock.find('.entity-herd-date-fully').text(entity.herd_date_fully_label);
 		entityBlock.find('.entity-herd-days-needed-fully').text(entity.herd_days_needed_fully);
@@ -238,7 +231,78 @@ jQuery(document).ready(function($) {
 				shared: true
 			}
 		});
-		var maxMultiplier = Math.min(entity.days[entity.days.length - 1].people_fully_vaccinated / entity.population * 2, 1);
+		var maxMultiplier = Math.min(entity.days[entity.days.length - 1].people_vaccinated / entity.population * 2, 1);
+		Highcharts.chart('single-chart-' + i, {
+			title: {
+				text: 'People with 1+ Dose'
+			},
+			legend: {
+				enabled: false
+			},
+			xAxis: {
+				categories: entity.days.map(day => day.date.substring(5, day.date.length)),
+				labels: {
+					step: 4
+				}
+			},
+			yAxis: [
+				{
+					title: {
+						text: 'People with 1+ Dose'
+					},
+					min: 0,
+					max: entity.population * maxMultiplier,
+					endOnTick: false,
+					gridLineWidth: 0,
+					plotLines: [{
+						color: '#11ba82',
+						label: {
+							text: 'HERD',
+							align: 'left',
+							textAlign: 'right',
+							x: -8,
+							y: 2
+						},
+						value: entity.herd_population,
+						width: '1',
+						zIndex: 2
+					}]
+				},
+				{
+					title: {
+						text: '% of Population'
+					},
+					min: 0,
+					max: 100 * maxMultiplier,
+					endOnTick: false,
+					gridLineColor: '#c7c7c7',
+					opposite: true
+				}
+			],
+			series: [
+				{
+					name: 'People with 1+ Dose',
+					type: 'areaspline',
+					data: entity.days.map(day => [day.date, day.people_vaccinated]),
+					color: '#11ba82'
+				},
+				{ // only included for axis purposes
+					name: 'Percentage of Population',
+					type: 'line',
+					yAxis: 1,
+					visible: false,
+					data: entity.days.map(day => [day.date, (day.people_vaccinated / entity.population) * 100])
+				}
+			],
+			tooltip: {
+				formatter: function(tooltip) {
+					var newTooltip = tooltip.defaultFormatter.call(this, tooltip);
+					newTooltip[2] = '<strong>' + (this.y / entity.population * 100).toFixed(2) + '% of population</strong>';
+					return newTooltip;
+				}
+			}
+		});
+		maxMultiplier = Math.min(entity.days[entity.days.length - 1].people_fully_vaccinated / entity.population * 2, 1);
 		Highcharts.chart('fully-chart-' + i, {
 			title: {
 				text: 'People Fully Vaccinated'
