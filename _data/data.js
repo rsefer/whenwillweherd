@@ -218,22 +218,6 @@ async function formatData() {
 			thisEntityObj.herd_date = herdDate;
 			thisEntityObj.herd_date_label = roughDate(thisEntityObj.herd_date);
 
-			// fully
-			thisEntityObj.herd_people_needed_fully = Math.ceil((thisEntityObj.population * 2 * formattedData.herdPercentage) - thisEntityObj.people_fully_vaccinated);
-			thisEntityObj.herd_days_needed_fully = Math.ceil(thisEntityObj.herd_people_needed_fully / thisEntityObj.people_fully_vaccinated_rolling_average_7);
-			let herdDateFully = new Date();
-			herdDateFully.setDate(today.getDate() + thisEntityObj.herd_days_needed_fully);
-			thisEntityObj.herd_date_fully = herdDateFully;
-			thisEntityObj.herd_date_fully_label = roughDate(thisEntityObj.herd_date_fully);
-
-			// // complete
-			// thisEntityObj.completion_vacs_needed_double = Math.ceil((thisEntityObj.population * 2) - thisEntityObj.total_vaccinations);
-			// thisEntityObj.completion_days_needed_double = Math.ceil(thisEntityObj.completion_vacs_needed_double / thisEntityObj.rolling_average_7);
-			// let completionDateDouble = new Date();
-			// completionDateDouble.setDate(today.getDate() + thisEntityObj.completion_days_needed_double);
-			// thisEntityObj.completion_date_double = completionDateDouble;
-			// thisEntityObj.completion_date_double_label = roughDate(thisEntityObj.completion_date_double);
-
 		}
 		thisEntityObj.days.splice(0, thisEntityObj.days.length - keepLastCount);
 		formattedData.entities.push(thisEntityObj);
