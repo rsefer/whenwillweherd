@@ -61,21 +61,21 @@ title: 'Home'
 			<div class="border-t border-gray-200 dark:border-green-500">
 				<dl>
 					<div class="bg-green-300 dark:bg-green-500 px-4 py-5 grid grid-cols-2 sm:gap-4 sm:px-6">
-						<dt class="text-sm font-medium text-gray-600 dark:text-white">
-							<span class="font-semibold">Herd Immunity</span><br>
-							<small>({{ data.formatted.herdPercentageLabel }}% of the population)</small>
-						</dt>
-						<dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 text-right">
-							<div class="entity-herd-date-double font-bold"></div>
-							<div style="display: none;"><small><em>(<span class="entity-herd-days-needed-double"></span> days)</em></small></div>
-						</dd>
 						<dt class="single-vacinated-el text-sm font-medium text-gray-600 dark:text-white">
-							<span class="font-semibold">Herd Immunity Single Vaccinated</span><br>
+							<span class="font-semibold">Herd Immunity (At Least 1 Dose)</span><br>
 							<small>({{ data.formatted.herdPercentageLabel }}% of the population)</small>
 						</dt>
 						<dd class="single-vacinated-el mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 text-right">
 							<div class="entity-herd-date-single font-bold"></div>
 							<div style="display: none;"><small><em>(<span class="entity-herd-days-needed-single"></span> days)</em></small></div>
+						</dd>
+						<dt class="text-sm font-medium text-gray-600 dark:text-white">
+							<span class="font-semibold">Herd Immunity (Fully Vacinated)</span><br>
+							<small>({{ data.formatted.herdPercentageLabel }}% of the population)</small>
+						</dt>
+						<dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 text-right">
+							<div class="entity-herd-date-double font-bold"></div>
+							<div style="display: none;"><small><em>(<span class="entity-herd-days-needed-double"></span> days)</em></small></div>
 						</dd>
 						<dt class="fully-vacinated-el text-sm font-medium text-gray-600 dark:text-white">
 							<span class="font-semibold">Herd Immunity Fully Vaccinated</span><br>

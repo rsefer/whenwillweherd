@@ -211,7 +211,7 @@ async function formatData() {
 			thisEntityObj.herd_date_double_label = roughDate(thisEntityObj.herd_date_double);
 
 			// herd - at least one dose
-			thisEntityObj.herd_people_needed = Math.ceil((thisEntityObj.population * 2 * formattedData.herdPercentage) - thisEntityObj.people_vaccinated);
+			thisEntityObj.herd_people_needed = Math.ceil((thisEntityObj.population * formattedData.herdPercentage) - thisEntityObj.people_vaccinated);
 			thisEntityObj.herd_days_needed = Math.ceil(thisEntityObj.herd_people_needed / thisEntityObj.people_vaccinated_rolling_average_7);
 			let herdDate = new Date();
 			herdDate.setDate(today.getDate() + thisEntityObj.herd_days_needed);
