@@ -219,7 +219,7 @@ jQuery(document).ready(function($) {
 			yAxis: [
 				{
 					title: {
-						text: 'People with 1+ Dose'
+						text: 'People'
 					},
 					min: 0,
 					max: entity.population * maxMultiplier,
@@ -255,7 +255,7 @@ jQuery(document).ready(function($) {
 					name: 'People with 1+ Dose',
 					type: 'areaspline',
 					data: entity.days.map(day => [day.date, day.people_vaccinated]),
-					color: '#11ba82'
+					color: '#ffc621'
 				},
 				{ // only included for axis purposes
 					name: 'Percentage of Population',
@@ -290,7 +290,7 @@ jQuery(document).ready(function($) {
 			yAxis: [
 				{
 					title: {
-						text: 'People Fully Vaccinated'
+						text: 'People'
 					},
 					min: 0,
 					max: entity.population * maxMultiplier,
