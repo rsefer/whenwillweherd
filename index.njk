@@ -155,26 +155,26 @@ jQuery(document).ready(function($) {
 		entityBlock.find('.single-chart').attr('id', 'single-chart-' + i);
 		entityBlock.find('.fully-chart').attr('id', 'fully-chart-' + i);
 		entityBlock.find('.entity-title').text(entity.name);
-		if (entity.abbreviation) {
-			entityBlock.find('.entity-title').prepend('<img src="/images/flags/' + entity.abbreviation.toLowerCase() + '.svg" alt="' + entity.abbreviation.toLowerCase() + ' flag">');
+		if (entity.abv) {
+			entityBlock.find('.entity-title').prepend('<img src="/images/flags/' + entity.abv.toLowerCase() + '.svg" alt="' + entity.abv.toLowerCase() + ' flag">');
 		}
-		entityBlock.find('.entity-population').text(numberWithCommas(entity.population));
-		entityBlock.find('.entity-vacs-given').text(numberWithCommas(entity.total_vaccinations));
-		entityBlock.find('.entity-vacs-per-100').text(entity.total_vaccinations_per_hundred);
+		entityBlock.find('.entity-population').text(numberWithCommas(entity.pop));
+		entityBlock.find('.entity-vacs-given').text(numberWithCommas(entity.tv));
+		entityBlock.find('.entity-vacs-per-100').text(entity.tvh);
 
 		// herd
-		entityBlock.find('.entity-herd-date-double').text(entity.herd_date_double_label);
-		entityBlock.find('.entity-herd-days-needed-double').text(entity.herd_days_needed_double);
+		entityBlock.find('.entity-herd-date-double').text(entity.hddl);
+		entityBlock.find('.entity-herd-days-needed-double').text(entity.hdnd);
 
-		entityBlock.find('.entity-herd-date-single').text(entity.herd_date_label);
-		entityBlock.find('.entity-herd-days-needed-single').text(entity.herd_days_needed);
+		entityBlock.find('.entity-herd-date-single').text(entity.hdl);
+		entityBlock.find('.entity-herd-days-needed-single').text(entity.hdn);
 
 		Highcharts.chart('vaccinations-chart-' + i, {
 			title: {
 				text: 'Daily Vaccinations'
 			},
 			xAxis: {
-				categories: entity.days.map(day => day.date.substring(5, day.date.length)),
+				categories: entity.days.map(day => day.d.substring(5, day.d.length)),
 				labels: {
 					step: 4
 				}
@@ -190,19 +190,19 @@ jQuery(document).ready(function($) {
 				{
 					name: 'Daily Vaccinations',
 					type: 'column',
-					data: entity.days.map(day => [day.date, day.daily_vaccinations_raw])
+					data: entity.days.map(day => [day.d, day.dvr])
 				},
 				{
 					name: '7 Day Rolling Average',
 					type: 'spline',
-					data: entity.days.map(day => [day.date, day.daily_vaccinations])
+					data: entity.days.map(day => [day.d, day.dv])
 				}
 			],
 			tooltip: {
 				shared: true
 			}
 		});
-		var maxMultiplier = Math.min(entity.days[entity.days.length - 1].people_vaccinated / entity.population * 2, 1);
+		var maxMultiplier = Math.min(entity.days[entity.days.length - 1].pv / entity.pop * 2, 1);
 		Highcharts.chart('single-chart-' + i, {
 			title: {
 				text: 'People with 1+ Dose'
@@ -211,7 +211,7 @@ jQuery(document).ready(function($) {
 				enabled: false
 			},
 			xAxis: {
-				categories: entity.days.map(day => day.date.substring(5, day.date.length)),
+				categories: entity.days.map(day => day.d.substring(5, day.d.length)),
 				labels: {
 					step: 4
 				}
@@ -222,7 +222,7 @@ jQuery(document).ready(function($) {
 						text: 'People'
 					},
 					min: 0,
-					max: entity.population * maxMultiplier,
+					max: entity.pop * maxMultiplier,
 					endOnTick: false,
 					gridLineWidth: 0,
 					plotLines: [{
@@ -234,7 +234,7 @@ jQuery(document).ready(function($) {
 							x: -8,
 							y: 2
 						},
-						value: entity.herd_population,
+						value: entity.hp,
 						width: '1',
 						zIndex: 2
 					}]
@@ -254,7 +254,7 @@ jQuery(document).ready(function($) {
 				{
 					name: 'People with 1+ Dose',
 					type: 'areaspline',
-					data: entity.days.map(day => [day.date, day.people_vaccinated]),
+					data: entity.days.map(day => [day.d, day.pv]),
 					color: '#ffc621'
 				},
 				{ // only included for axis purposes
@@ -262,18 +262,18 @@ jQuery(document).ready(function($) {
 					type: 'line',
 					yAxis: 1,
 					visible: false,
-					data: entity.days.map(day => [day.date, (day.people_vaccinated / entity.population) * 100])
+					data: entity.days.map(day => [day.d, (day.pv / entity.pop) * 100])
 				}
 			],
 			tooltip: {
 				formatter: function(tooltip) {
 					var newTooltip = tooltip.defaultFormatter.call(this, tooltip);
-					newTooltip[2] = '<strong>' + (this.y / entity.population * 100).toFixed(2) + '% of population</strong>';
+					newTooltip[2] = '<strong>' + (this.y / entity.pop * 100).toFixed(2) + '% of population</strong>';
 					return newTooltip;
 				}
 			}
 		});
-		maxMultiplier = Math.min(entity.days[entity.days.length - 1].people_fully_vaccinated / entity.population * 2, 1);
+		maxMultiplier = Math.min(entity.days[entity.days.length - 1].pfv / entity.pop * 2, 1);
 		Highcharts.chart('fully-chart-' + i, {
 			title: {
 				text: 'People Fully Vaccinated'
@@ -282,7 +282,7 @@ jQuery(document).ready(function($) {
 				enabled: false
 			},
 			xAxis: {
-				categories: entity.days.map(day => day.date.substring(5, day.date.length)),
+				categories: entity.days.map(day => day.d.substring(5, day.d.length)),
 				labels: {
 					step: 4
 				}
@@ -293,7 +293,7 @@ jQuery(document).ready(function($) {
 						text: 'People'
 					},
 					min: 0,
-					max: entity.population * maxMultiplier,
+					max: entity.pop * maxMultiplier,
 					endOnTick: false,
 					gridLineWidth: 0,
 					plotLines: [{
@@ -305,7 +305,7 @@ jQuery(document).ready(function($) {
 							x: -8,
 							y: 2
 						},
-						value: entity.herd_population,
+						value: entity.hp,
 						width: '1',
 						zIndex: 2
 					}]
@@ -325,7 +325,7 @@ jQuery(document).ready(function($) {
 				{
 					name: 'People Fully Vaccinated',
 					type: 'areaspline',
-					data: entity.days.map(day => [day.date, day.people_fully_vaccinated]),
+					data: entity.days.map(day => [day.d, day.pfv]),
 					color: '#11ba82'
 				},
 				{ // only included for axis purposes
@@ -333,13 +333,13 @@ jQuery(document).ready(function($) {
 					type: 'line',
 					yAxis: 1,
 					visible: false,
-					data: entity.days.map(day => [day.date, (day.people_fully_vaccinated / entity.population) * 100])
+					data: entity.days.map(day => [day.d, (day.pfv / entity.pop) * 100])
 				}
 			],
 			tooltip: {
 				formatter: function(tooltip) {
 					var newTooltip = tooltip.defaultFormatter.call(this, tooltip);
-					newTooltip[2] = '<strong>' + (this.y / entity.population * 100).toFixed(2) + '% of population</strong>';
+					newTooltip[2] = '<strong>' + (this.y / entity.pop * 100).toFixed(2) + '% of population</strong>';
 					return newTooltip;
 				}
 			}
