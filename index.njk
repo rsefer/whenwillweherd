@@ -136,6 +136,8 @@ Highcharts.setOptions({
 	},
 });
 
+var charts = [];
+
 entities.forEach(function(entity, i) {
 	var entityTemplate = document.querySelector('.entity-template').innerHTML;
 	document.querySelector('#charts-wrap').innerHTML = document.querySelector('#charts-wrap').innerHTML + '<div id="entity-' + i + '" class="entity">' + entityTemplate + '</div>';
@@ -160,7 +162,7 @@ entities.forEach(function(entity, i) {
 
 	entityBlock.querySelector('.entity-herd-date-single').textContent = entity.hdl;
 
-	Highcharts.chart('vaccinations-chart-' + i, {
+	var vaxChart = Highcharts.chart('vaccinations-chart-' + i, {
 		title: {
 			text: 'Daily Vaccinations'
 		},
@@ -194,7 +196,7 @@ entities.forEach(function(entity, i) {
 		}
 	});
 	var maxMultiplier = Math.min(entity.days[entity.days.length - 1].pv / entity.pop * 2, 1);
-	Highcharts.chart('single-chart-' + i, {
+	var singleChart = Highcharts.chart('single-chart-' + i, {
 		title: {
 			text: 'People with 1+ Dose'
 		},
@@ -265,7 +267,7 @@ entities.forEach(function(entity, i) {
 		}
 	});
 	maxMultiplier = Math.min(entity.days[entity.days.length - 1].pfv / entity.pop * 2, 1);
-	Highcharts.chart('fully-chart-' + i, {
+	var fullyChart = Highcharts.chart('fully-chart-' + i, {
 		title: {
 			text: 'People Fully Vaccinated'
 		},
@@ -336,11 +338,25 @@ entities.forEach(function(entity, i) {
 		}
 	});
 
+	charts.push(vaxChart);
+	charts.push(singleChart);
+	charts.push(fullyChart);
+
+	setTimeout(function() {
+		vaxChart.reflow();
+	}, 500);
+
 	document.querySelector('[name="select-state"]').addEventListener('change', function() {
-		console.log(this);
 		window.location.href = '/?state=' + this.value;
 	});
 });
+
+setTimeout(function() {
+	charts.forEach(function(chart) {
+		chart.redraw();
+	});
+}, 3500);
+
 
 function numberWithCommas(x) {
 	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
