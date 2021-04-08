@@ -342,21 +342,16 @@ entities.forEach(function(entity, i) {
 	charts.push(singleChart);
 	charts.push(fullyChart);
 
-	setTimeout(function() {
-		vaxChart.reflow();
-	}, 500);
-
 	document.querySelector('[name="select-state"]').addEventListener('change', function() {
 		window.location.href = '/?state=' + this.value;
 	});
 });
 
-setTimeout(function() {
-	charts.forEach(function(chart) {
-		chart.redraw();
-	});
-}, 3500);
-
+// setTimeout(function() {
+// 	charts.forEach(function(chart) {
+// 		chart.redraw();
+// 	});
+// }, 3500);
 
 function numberWithCommas(x) {
 	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
