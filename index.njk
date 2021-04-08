@@ -103,21 +103,6 @@ title: 'Home'
 
 <script>
 {% set js %}
-document.querySelector('.last-updated').textContent = new Date('{{ data.timestamp }}').toLocaleString();
-
-var urlParams = new URLSearchParams(window.location.search);
-var stateName = urlParams.get('state') || 'Illinois';
-if (stateName == 'New York') {
-	stateName = 'New York State';
-}
-
-var data = {{ data.raw | safe }};
-
-var entities = [
-	data.entities.find(entity => entity.name == stateName),
-	data.entities.find(entity => entity.name == 'United States')
-];
-
 Highcharts.setOptions({
 	lang: {
 		thousandsSep: ','
@@ -136,11 +121,30 @@ Highcharts.setOptions({
 	},
 });
 
+document.querySelector('.last-updated').textContent = new Date('{{ data.timestamp }}').toLocaleString();
+
+var urlParams = new URLSearchParams(window.location.search);
+var stateName = urlParams.get('state') || 'Illinois';
+if (stateName == 'New York') {
+	stateName = 'New York State';
+}
+
+var data = {{ data.raw | safe }};
+
+var entities = [
+	data.entities.find(entity => entity.name == stateName),
+	data.entities.find(entity => entity.name == 'United States')
+];
+
 var charts = [];
 
 entities.forEach(function(entity, i) {
+	initiateEntity(entities[i], i);
+});
+
+function initiateEntity(entity, i) {
 	var entityTemplate = document.querySelector('.entity-template').innerHTML;
-	document.querySelector('#charts-wrap').innerHTML = document.querySelector('#charts-wrap').innerHTML + '<div id="entity-' + i + '" class="entity">' + entityTemplate + '</div>';
+	document.querySelector('#charts-wrap').insertAdjacentHTML('beforeend', '<div id="entity-' + i + '" class="entity">' + entityTemplate + '</div>');
 	var entityBlock = document.getElementById('entity-' + i);
 	if (entity.name == 'United States') {
 		entityBlock.querySelector('.entity-selection').remove();
@@ -151,7 +155,7 @@ entities.forEach(function(entity, i) {
 	entityBlock.querySelector('.fully-chart').id = 'fully-chart-' + i;
 	entityBlock.querySelector('.entity-title').textContent = entity.name;
 	if (entity.abv) {
-		entityBlock.querySelector('.entity-title').innerHTML = '<img src="/images/flags/' + entity.abv.toLowerCase() + '.svg" alt="' + entity.abv.toLowerCase() + ' flag">' + entityBlock.querySelector('.entity-title').innerHTML;
+		entityBlock.querySelector('.entity-title').insertAdjacentHTML('afterbegin', '<img src="/images/flags/' + entity.abv.toLowerCase() + '.svg" alt="' + entity.abv.toLowerCase() + ' flag">');
 	}
 	entityBlock.querySelector('.entity-population').textContent = numberWithCommas(entity.pop);
 	entityBlock.querySelector('.entity-vacs-given').textContent = numberWithCommas(entity.tv);
@@ -159,10 +163,9 @@ entities.forEach(function(entity, i) {
 
 	// herd
 	entityBlock.querySelector('.entity-herd-date-double').textContent = entity.hddl;
-
 	entityBlock.querySelector('.entity-herd-date-single').textContent = entity.hdl;
 
-	var vaxChart = Highcharts.chart('vaccinations-chart-' + i, {
+	charts['vc-' + i] = Highcharts.chart('vaccinations-chart-' + i, {
 		title: {
 			text: 'Daily Vaccinations'
 		},
@@ -196,7 +199,7 @@ entities.forEach(function(entity, i) {
 		}
 	});
 	var maxMultiplier = Math.min(entity.days[entity.days.length - 1].pv / entity.pop * 2, 1);
-	var singleChart = Highcharts.chart('single-chart-' + i, {
+	charts['sc-' + i] = Highcharts.chart('single-chart-' + i, {
 		title: {
 			text: 'People with 1+ Dose'
 		},
@@ -267,7 +270,7 @@ entities.forEach(function(entity, i) {
 		}
 	});
 	maxMultiplier = Math.min(entity.days[entity.days.length - 1].pfv / entity.pop * 2, 1);
-	var fullyChart = Highcharts.chart('fully-chart-' + i, {
+	charts['fc-' + i] = Highcharts.chart('fully-chart-' + i, {
 		title: {
 			text: 'People Fully Vaccinated'
 		},
@@ -338,20 +341,10 @@ entities.forEach(function(entity, i) {
 		}
 	});
 
-	charts.push(vaxChart);
-	charts.push(singleChart);
-	charts.push(fullyChart);
-
 	document.querySelector('[name="select-state"]').addEventListener('change', function() {
 		window.location.href = '/?state=' + this.value;
 	});
-});
-
-// setTimeout(function() {
-// 	charts.forEach(function(chart) {
-// 		chart.redraw();
-// 	});
-// }, 3500);
+}
 
 function numberWithCommas(x) {
 	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
