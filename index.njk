@@ -99,253 +99,247 @@ title: 'Home'
 
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/9.0.1/highcharts.min.js" integrity="sha512-EIJ4kNprq9ImB7okK8Wy5o4frtpx1zERP1A3ZrLXr5nOGEWhVViC1XVuzJ8GGG89sJ/bKbtw+6TsQlul9/WcEg==" crossorigin="anonymous"></script>
 
 <script>
 {% set js %}
-jQuery(document).ready(function($) {
+document.querySelector('.last-updated').textContent = new Date('{{ data.timestamp }}').toLocaleString();
 
-	$('.last-updated').text(new Date('{{ data.timestamp }}').toLocaleString());
+var urlParams = new URLSearchParams(window.location.search);
+var stateName = urlParams.get('state') || 'Illinois';
+if (stateName == 'New York') {
+	stateName = 'New York State';
+}
 
-	var urlParams = new URLSearchParams(window.location.search);
-	var stateName = urlParams.get('state') || 'Illinois';
-	if (stateName == 'New York') {
-		stateName = 'New York State';
+var data = {{ data.raw | safe }};
+
+var entities = [
+	data.entities.find(entity => entity.name == stateName),
+	data.entities.find(entity => entity.name == 'United States')
+];
+
+Highcharts.setOptions({
+	lang: {
+		thousandsSep: ','
+	},
+	chart: {
+		type: 'column',
+		height: '250',
+		style: {
+			fontFamily: '-apple-system, \'Helvetica Neue\', sans-serif'
+		}
+	},
+	plotOptions: {
+		series: {
+			animation: false
+		}
+	},
+});
+
+entities.forEach(function(entity, i) {
+	var entityTemplate = document.querySelector('.entity-template').innerHTML;
+	document.querySelector('#charts-wrap').innerHTML = document.querySelector('#charts-wrap').innerHTML + '<div id="entity-' + i + '" class="entity">' + entityTemplate + '</div>';
+	var entityBlock = document.getElementById('entity-' + i);
+	if (entity.name == 'United States') {
+		entityBlock.querySelector('.entity-selection').remove();
+		entityBlock.querySelector('.entity-title').classList.add('sm:text-center');
 	}
+	entityBlock.querySelector('.vaccinations-chart').id = 'vaccinations-chart-' + i;
+	entityBlock.querySelector('.single-chart').id = 'single-chart-' + i;
+	entityBlock.querySelector('.fully-chart').id = 'fully-chart-' + i;
+	entityBlock.querySelector('.entity-title').textContent = entity.name;
+	if (entity.abv) {
+		entityBlock.querySelector('.entity-title').innerHTML = '<img src="/images/flags/' + entity.abv.toLowerCase() + '.svg" alt="' + entity.abv.toLowerCase() + ' flag">' + entityBlock.querySelector('.entity-title').innerHTML;
+	}
+	entityBlock.querySelector('.entity-population').textContent = numberWithCommas(entity.pop);
+	entityBlock.querySelector('.entity-vacs-given').textContent = numberWithCommas(entity.tv);
+	entityBlock.querySelector('.entity-vacs-per-100').textContent = entity.tvh;
 
-	$('body').on('change', '[name="select-state"]', function() {
+	// herd
+	entityBlock.querySelector('.entity-herd-date-double').textContent = entity.hddl;
+
+	entityBlock.querySelector('.entity-herd-date-single').textContent = entity.hdl;
+
+	Highcharts.chart('vaccinations-chart-' + i, {
+		title: {
+			text: 'Daily Vaccinations'
+		},
+		xAxis: {
+			categories: entity.days.map(day => day.d.substring(5, day.d.length)),
+			labels: {
+				step: 4
+			}
+		},
+		yAxis: [
+			{
+				title: {
+					text: 'Vaccinations'
+				}
+			}
+		],
+		series: [
+			{
+				name: 'Daily Vaccinations',
+				type: 'column',
+				data: entity.days.map(day => [day.d, day.dvr])
+			},
+			{
+				name: '7 Day Rolling Average',
+				type: 'spline',
+				data: entity.days.map(day => [day.d, day.dv])
+			}
+		],
+		tooltip: {
+			shared: true
+		}
+	});
+	var maxMultiplier = Math.min(entity.days[entity.days.length - 1].pv / entity.pop * 2, 1);
+	Highcharts.chart('single-chart-' + i, {
+		title: {
+			text: 'People with 1+ Dose'
+		},
+		legend: {
+			enabled: false
+		},
+		xAxis: {
+			categories: entity.days.map(day => day.d.substring(5, day.d.length)),
+			labels: {
+				step: 4
+			}
+		},
+		yAxis: [
+			{
+				title: {
+					text: 'People'
+				},
+				min: 0,
+				max: entity.pop * maxMultiplier,
+				endOnTick: false,
+				gridLineWidth: 0,
+				plotLines: [{
+					color: '#11ba82',
+					label: {
+						text: 'HERD',
+						align: 'left',
+						textAlign: 'right',
+						x: -8,
+						y: 2
+					},
+					value: entity.hp,
+					width: '1',
+					zIndex: 2
+				}]
+			},
+			{
+				title: {
+					text: '% of Population'
+				},
+				min: 0,
+				max: 100 * maxMultiplier,
+				endOnTick: false,
+				gridLineColor: '#c7c7c7',
+				opposite: true
+			}
+		],
+		series: [
+			{
+				name: 'People with 1+ Dose',
+				type: 'areaspline',
+				data: entity.days.map(day => [day.d, day.pv]),
+				color: '#ffc621'
+			},
+			{ // only included for axis purposes
+				name: 'Percentage of Population',
+				type: 'line',
+				yAxis: 1,
+				visible: false,
+				data: entity.days.map(day => [day.d, (day.pv / entity.pop) * 100])
+			}
+		],
+		tooltip: {
+			formatter: function(tooltip) {
+				var newTooltip = tooltip.defaultFormatter.call(this, tooltip);
+				newTooltip[2] = '<strong>' + (this.y / entity.pop * 100).toFixed(2) + '% of population</strong>';
+				return newTooltip;
+			}
+		}
+	});
+	maxMultiplier = Math.min(entity.days[entity.days.length - 1].pfv / entity.pop * 2, 1);
+	Highcharts.chart('fully-chart-' + i, {
+		title: {
+			text: 'People Fully Vaccinated'
+		},
+		legend: {
+			enabled: false
+		},
+		xAxis: {
+			categories: entity.days.map(day => day.d.substring(5, day.d.length)),
+			labels: {
+				step: 4
+			}
+		},
+		yAxis: [
+			{
+				title: {
+					text: 'People'
+				},
+				min: 0,
+				max: entity.pop * maxMultiplier,
+				endOnTick: false,
+				gridLineWidth: 0,
+				plotLines: [{
+					color: '#11ba82',
+					label: {
+						text: 'HERD',
+						align: 'left',
+						textAlign: 'right',
+						x: -8,
+						y: 2
+					},
+					value: entity.hp,
+					width: '1',
+					zIndex: 2
+				}]
+			},
+			{
+				title: {
+					text: '% of Population'
+				},
+				min: 0,
+				max: 100 * maxMultiplier,
+				endOnTick: false,
+				gridLineColor: '#c7c7c7',
+				opposite: true
+			}
+		],
+		series: [
+			{
+				name: 'People Fully Vaccinated',
+				type: 'areaspline',
+				data: entity.days.map(day => [day.d, day.pfv]),
+				color: '#11ba82'
+			},
+			{ // only included for axis purposes
+				name: 'Percentage of Population',
+				type: 'line',
+				yAxis: 1,
+				visible: false,
+				data: entity.days.map(day => [day.d, (day.pfv / entity.pop) * 100])
+			}
+		],
+		tooltip: {
+			formatter: function(tooltip) {
+				var newTooltip = tooltip.defaultFormatter.call(this, tooltip);
+				newTooltip[2] = '<strong>' + (this.y / entity.pop * 100).toFixed(2) + '% of population</strong>';
+				return newTooltip;
+			}
+		}
+	});
+
+	document.querySelector('[name="select-state"]').addEventListener('change', function() {
+		console.log(this);
 		window.location.href = '/?state=' + this.value;
 	});
-
-	var data = {{ data.raw | safe }};
-
-	var entities = [
-		data.entities.find(entity => entity.name == stateName),
-		data.entities.find(entity => entity.name == 'United States')
-	];
-
-	Highcharts.setOptions({
-		lang: {
-			thousandsSep: ','
-		},
-		chart: {
-			type: 'column',
-			height: '250',
-			style: {
-				fontFamily: '-apple-system, \'Helvetica Neue\', sans-serif'
-			}
-		},
-		plotOptions: {
-			series: {
-				animation: false
-			}
-		},
-	});
-
-	entities.forEach(function(entity, i) {
-		var entityTemplate = $('.entity-template').html();
-		$('#charts-wrap').append('<div id="entity-' + i + '" class="entity">' + entityTemplate + '</div>');
-		var entityBlock = $('#entity-' + i);
-		if (entity.name == 'United States') {
-			entityBlock.find('.entity-selection').remove();
-			entityBlock.find('.entity-title').addClass('sm:text-center');
-		}
-		entityBlock.find('.vaccinations-chart').attr('id', 'vaccinations-chart-' + i);
-		entityBlock.find('.single-chart').attr('id', 'single-chart-' + i);
-		entityBlock.find('.fully-chart').attr('id', 'fully-chart-' + i);
-		entityBlock.find('.entity-title').text(entity.name);
-		if (entity.abv) {
-			entityBlock.find('.entity-title').prepend('<img src="/images/flags/' + entity.abv.toLowerCase() + '.svg" alt="' + entity.abv.toLowerCase() + ' flag">');
-		}
-		entityBlock.find('.entity-population').text(numberWithCommas(entity.pop));
-		entityBlock.find('.entity-vacs-given').text(numberWithCommas(entity.tv));
-		entityBlock.find('.entity-vacs-per-100').text(entity.tvh);
-
-		// herd
-		entityBlock.find('.entity-herd-date-double').text(entity.hddl);
-		entityBlock.find('.entity-herd-days-needed-double').text(entity.hdnd);
-
-		entityBlock.find('.entity-herd-date-single').text(entity.hdl);
-		entityBlock.find('.entity-herd-days-needed-single').text(entity.hdn);
-
-		Highcharts.chart('vaccinations-chart-' + i, {
-			title: {
-				text: 'Daily Vaccinations'
-			},
-			xAxis: {
-				categories: entity.days.map(day => day.d.substring(5, day.d.length)),
-				labels: {
-					step: 4
-				}
-			},
-			yAxis: [
-				{
-					title: {
-						text: 'Vaccinations'
-					}
-				}
-			],
-			series: [
-				{
-					name: 'Daily Vaccinations',
-					type: 'column',
-					data: entity.days.map(day => [day.d, day.dvr])
-				},
-				{
-					name: '7 Day Rolling Average',
-					type: 'spline',
-					data: entity.days.map(day => [day.d, day.dv])
-				}
-			],
-			tooltip: {
-				shared: true
-			}
-		});
-		var maxMultiplier = Math.min(entity.days[entity.days.length - 1].pv / entity.pop * 2, 1);
-		Highcharts.chart('single-chart-' + i, {
-			title: {
-				text: 'People with 1+ Dose'
-			},
-			legend: {
-				enabled: false
-			},
-			xAxis: {
-				categories: entity.days.map(day => day.d.substring(5, day.d.length)),
-				labels: {
-					step: 4
-				}
-			},
-			yAxis: [
-				{
-					title: {
-						text: 'People'
-					},
-					min: 0,
-					max: entity.pop * maxMultiplier,
-					endOnTick: false,
-					gridLineWidth: 0,
-					plotLines: [{
-						color: '#11ba82',
-						label: {
-							text: 'HERD',
-							align: 'left',
-							textAlign: 'right',
-							x: -8,
-							y: 2
-						},
-						value: entity.hp,
-						width: '1',
-						zIndex: 2
-					}]
-				},
-				{
-					title: {
-						text: '% of Population'
-					},
-					min: 0,
-					max: 100 * maxMultiplier,
-					endOnTick: false,
-					gridLineColor: '#c7c7c7',
-					opposite: true
-				}
-			],
-			series: [
-				{
-					name: 'People with 1+ Dose',
-					type: 'areaspline',
-					data: entity.days.map(day => [day.d, day.pv]),
-					color: '#ffc621'
-				},
-				{ // only included for axis purposes
-					name: 'Percentage of Population',
-					type: 'line',
-					yAxis: 1,
-					visible: false,
-					data: entity.days.map(day => [day.d, (day.pv / entity.pop) * 100])
-				}
-			],
-			tooltip: {
-				formatter: function(tooltip) {
-					var newTooltip = tooltip.defaultFormatter.call(this, tooltip);
-					newTooltip[2] = '<strong>' + (this.y / entity.pop * 100).toFixed(2) + '% of population</strong>';
-					return newTooltip;
-				}
-			}
-		});
-		maxMultiplier = Math.min(entity.days[entity.days.length - 1].pfv / entity.pop * 2, 1);
-		Highcharts.chart('fully-chart-' + i, {
-			title: {
-				text: 'People Fully Vaccinated'
-			},
-			legend: {
-				enabled: false
-			},
-			xAxis: {
-				categories: entity.days.map(day => day.d.substring(5, day.d.length)),
-				labels: {
-					step: 4
-				}
-			},
-			yAxis: [
-				{
-					title: {
-						text: 'People'
-					},
-					min: 0,
-					max: entity.pop * maxMultiplier,
-					endOnTick: false,
-					gridLineWidth: 0,
-					plotLines: [{
-						color: '#11ba82',
-						label: {
-							text: 'HERD',
-							align: 'left',
-							textAlign: 'right',
-							x: -8,
-							y: 2
-						},
-						value: entity.hp,
-						width: '1',
-						zIndex: 2
-					}]
-				},
-				{
-					title: {
-						text: '% of Population'
-					},
-					min: 0,
-					max: 100 * maxMultiplier,
-					endOnTick: false,
-					gridLineColor: '#c7c7c7',
-					opposite: true
-				}
-			],
-			series: [
-				{
-					name: 'People Fully Vaccinated',
-					type: 'areaspline',
-					data: entity.days.map(day => [day.d, day.pfv]),
-					color: '#11ba82'
-				},
-				{ // only included for axis purposes
-					name: 'Percentage of Population',
-					type: 'line',
-					yAxis: 1,
-					visible: false,
-					data: entity.days.map(day => [day.d, (day.pfv / entity.pop) * 100])
-				}
-			],
-			tooltip: {
-				formatter: function(tooltip) {
-					var newTooltip = tooltip.defaultFormatter.call(this, tooltip);
-					newTooltip[2] = '<strong>' + (this.y / entity.pop * 100).toFixed(2) + '% of population</strong>';
-					return newTooltip;
-				}
-			}
-		});
-	});
-
 });
 
 function numberWithCommas(x) {
