@@ -151,8 +151,8 @@ async function formatData() {
 			days: [],
 			total_vaccinations: 0,
 			rolling_average_7: 0,
-			people_vaccinated_rolling_average_7: 0,
-			people_fully_vaccinated_rolling_average_7: 0,
+			people_vaccinated_today_rolling_average_7: 0,
+			people_fully_vaccinated_today_rolling_average_7: 0,
 			pop: formattedData.populations[entity],
 			abbreviation: formattedData.abbreviations[entity]
 		};
@@ -210,26 +210,27 @@ async function formatData() {
 			const today = new Date();
 			thisEntityObj.pop = populations[thisEntityObj.name];
 
-			thisEntityObj.people_vaccinated_rolling_average_7 = Math.round(thisEntityObj.days.slice(Math.max(thisEntityObj.days.length - 7, 0)).reduce((accumulator, currentValue) => {
-				return accumulator + currentValue.pvt
+			thisEntityObj.people_vaccinated_today_rolling_average_7 = Math.round(thisEntityObj.days.slice(Math.max(thisEntityObj.days.length - 7, 0)).reduce((accumulator, currentValue) => {
+				return accumulator + currentValue.pvt;
 			}, 0) / 7);
 
-			thisEntityObj.people_fully_vaccinated_rolling_average_7 = Math.round(thisEntityObj.days.slice(Math.max(thisEntityObj.days.length - 7, 0)).reduce((accumulator, currentValue) => {
-				return accumulator + currentValue.people_fully_vaccinated_today
+			thisEntityObj.people_fully_vaccinated_today_rolling_average_7 = Math.round(thisEntityObj.days.slice(Math.max(thisEntityObj.days.length - 7, 0)).reduce((accumulator, currentValue) => {
+				return accumulator + currentValue.pfvt;
 			}, 0) / 7);
 
-			// herd - double dose
-			thisEntityObj.herd_vacs_needed_double = Math.ceil((thisEntityObj.pop * 2 * formattedData.herdPercentage) - thisEntityObj.total_vaccinations);
-			thisEntityObj.herd_days_needed_double = Math.ceil(thisEntityObj.herd_vacs_needed_double / thisEntityObj.rolling_average_7);
-			let herdDateDouble = new Date();
-			herdDateDouble.setDate(today.getDate() + thisEntityObj.herd_days_needed_double);
-			thisEntityObj.herd_date_double = herdDateDouble;
-			thisEntityObj.herd_date_double_label = roughDate(thisEntityObj.herd_date_double);
+			// herd - fully
+			thisEntityObj.herd_people_needed_fully = Math.ceil(thisEntityObj.pop * formattedData.herdPercentage) - thisEntityObj.people_fully_vaccinated;
+			thisEntityObj.herd_days_needed_fully = Math.ceil(thisEntityObj.herd_people_needed_fully / thisEntityObj.rolling_average_7);
+			let herdDateFully = new Date();
+			herdDateFully.setDate(today.getDate() + thisEntityObj.herd_days_needed_fully);
+			thisEntityObj.herd_date_fully = herdDateFully;
+			thisEntityObj.herd_date_fully_label = roughDate(thisEntityObj.herd_date_fully);
 
 			// herd - at least one dose
 			thisEntityObj.herd_people_needed = Math.ceil((thisEntityObj.pop * formattedData.herdPercentage) - thisEntityObj.people_vaccinated);
+			thisEntityObj.herd_days_needed_fully = Math.ceil(thisEntityObj.herd_vacs_needed_fully / thisEntityObj.people_fully_vaccinated_today_rolling_average_7);
 
-			thisEntityObj.herd_days_needed = Math.ceil(thisEntityObj.herd_people_needed / thisEntityObj.people_vaccinated_rolling_average_7);
+			thisEntityObj.herd_days_needed = Math.ceil(thisEntityObj.herd_people_needed / thisEntityObj.people_vaccinated_today_rolling_average_7);
 			let herdDate = new Date();
 			herdDate.setDate(today.getDate() + thisEntityObj.herd_days_needed);
 			thisEntityObj.herd_date = herdDate;
@@ -243,27 +244,27 @@ async function formatData() {
 		thisEntityObj.tvh = thisEntityObj.total_vaccinations_per_hundred;
 		thisEntityObj.hp = thisEntityObj.herd_population;
 		thisEntityObj.hdn = thisEntityObj.herd_days_needed;
-		thisEntityObj.hdnd = thisEntityObj.herd_days_needed_double;
+		thisEntityObj.hdnf = thisEntityObj.herd_days_needed_fully;
 		thisEntityObj.hd = thisEntityObj.herd_date;
 		thisEntityObj.hdl = thisEntityObj.herd_date_label;
-		thisEntityObj.hddl = thisEntityObj.herd_date_double_label;
+		thisEntityObj.hdfl = thisEntityObj.herd_date_fully_label;
 
 		delete thisEntityObj.abbreviation;
 		delete thisEntityObj.total_vaccinations;
 		delete thisEntityObj.total_vaccinations_per_hundred;
 		delete thisEntityObj.herd_population;
 		delete thisEntityObj.herd_people_needed;
-		delete thisEntityObj.herd_vacs_needed_double;
-		delete thisEntityObj.herd_days_needed;;
-		delete thisEntityObj.herd_days_needed_double;
+		delete thisEntityObj.herd_vacs_needed_fully;
+		delete thisEntityObj.herd_days_needed;
+		delete thisEntityObj.herd_days_needed_fully;
 		delete thisEntityObj.herd_date;
-		delete thisEntityObj.herd_date_double;
+		delete thisEntityObj.herd_date_fully;
 		delete thisEntityObj.herd_date_label;
-		delete thisEntityObj.herd_date_double_label;
+		delete thisEntityObj.herd_date_fully_label;
 		delete thisEntityObj.people_vaccinated;
-		delete thisEntityObj.people_vaccinated_rolling_average_7;
+		delete thisEntityObj.people_vaccinated_today_rolling_average_7;
 		delete thisEntityObj.people_fully_vaccinated;
-		delete thisEntityObj.people_fully_vaccinated_rolling_average_7;
+		delete thisEntityObj.people_fully_vaccinated_today_rolling_average_7;
 		delete thisEntityObj.rolling_average_7;
 		formattedData.entities.push(thisEntityObj);
 	}

@@ -68,7 +68,7 @@ title: 'Home'
 					</div>
 					<div class="single-vacinated-el mt-1 text-sm sm:mt-0 text-right">
 						<p class="entity-herd-date-single font-bold mt-4 mb-6"></p>
-						<p class="entity-herd-date-double font-bold"></p>
+						<p class="entity-herd-date-fully font-bold"></p>
 					</div>
 				</div>
 			</div>
@@ -161,7 +161,7 @@ function initiateEntity(entity, i) {
 	entityBlock.querySelector('.entity-vacs-per-100').textContent = entity.tvh;
 
 	// herd
-	entityBlock.querySelector('.entity-herd-date-double').textContent = entity.hddl;
+	entityBlock.querySelector('.entity-herd-date-fully').textContent = entity.hdfl;
 	entityBlock.querySelector('.entity-herd-date-single').textContent = entity.hdl;
 
 	charts['vc-' + i] = Highcharts.chart('vaccinations-chart-' + i, {
