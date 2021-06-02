@@ -211,11 +211,11 @@ async function formatData() {
 			thisEntityObj.pop = populations[thisEntityObj.name];
 
 			thisEntityObj.people_vaccinated_today_rolling_average_7 = Math.round(thisEntityObj.days.slice(Math.max(thisEntityObj.days.length - 7, 0)).reduce((accumulator, currentValue) => {
-				return accumulator + currentValue.pvt;
+				return (!isNaN(currentValue.pvt) ? accumulator + currentValue.pvt : accumulator);
 			}, 0) / 7);
 
 			thisEntityObj.people_fully_vaccinated_today_rolling_average_7 = Math.round(thisEntityObj.days.slice(Math.max(thisEntityObj.days.length - 7, 0)).reduce((accumulator, currentValue) => {
-				return accumulator + currentValue.pfvt;
+				return (!isNaN(currentValue.pfvt) ? accumulator + currentValue.pfvt : accumulator);
 			}, 0) / 7);
 
 			// herd - fully
