@@ -260,6 +260,11 @@ function initiateEntity(entity, i) {
 				data: entity.days.map(day => [day.d, (day.pv / entity.pop) * 100])
 			}
 		],
+		plotOptions: {
+			series: {
+				connectNulls: true
+			}
+    },
 		tooltip: {
 			formatter: function(tooltip) {
 				var newTooltip = tooltip.defaultFormatter.call(this, tooltip);
@@ -331,6 +336,11 @@ function initiateEntity(entity, i) {
 				data: entity.days.map(day => [day.d, (day.pfv / entity.pop) * 100])
 			}
 		],
+		plotOptions: {
+			series: {
+				connectNulls: true
+			}
+    },
 		tooltip: {
 			formatter: function(tooltip) {
 				var newTooltip = tooltip.defaultFormatter.call(this, tooltip);
